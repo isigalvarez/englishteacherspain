@@ -1,0 +1,2217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freelance English Teacher Finance Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .tabs {
+            background: #f8f9fa;
+            display: flex;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .tab {
+            background: none;
+            border: none;
+            padding: 15px 30px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+            background: white;
+        }
+        
+        .tab:hover {
+            background: #e9ecef;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-expense {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+        
+        .btn-expense:hover {
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+        
+        .btn-success:hover {
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+        
+        .btn-paid {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            padding: 6px 12px;
+            font-size: 12px;
+            width: auto;
+            margin: 0 2px;
+        }
+        
+        .btn-unpaid {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            padding: 6px 12px;
+            font-size: 12px;
+            width: auto;
+            margin: 0 2px;
+        }
+        
+        .summary {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 25px;
+            border-left: 5px solid #27ae60;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .summary-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .summary-item h3 {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .summary-item .amount {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .positive { color: #27ae60 !important; }
+        .negative { color: #e74c3c !important; }
+        .warning { color: #f39c12 !important; }
+        
+        .transactions {
+            grid-column: 1 / -1;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border-left: 5px solid #f39c12;
+        }
+        
+        .transaction-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .transaction-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .transaction-info {
+            flex: 1;
+        }
+        
+        .transaction-amount {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-left: 10px;
+        }
+        
+        .status-paid {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .status-overdue {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .invoice-filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #e9ecef;
+            border-radius: 8px;
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .students-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .student-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .student-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .student-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .student-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+        
+        .student-notes {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #e9ecef;
+            font-style: italic;
+        }
+        
+        .service-row {
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: white;
+        }
+        
+        .invoice-preview {
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 20px;
+        }
+        
+        .invoice-details table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .invoice-details th,
+        .invoice-details td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .invoice-details th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .invoice-details .total-row {
+            font-weight: bold;
+            background: #f8f9fa;
+        }
+        
+        .iva-indicator {
+            background: #f39c12;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+        
+        .close:hover {
+            color: #000;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .student-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+            }
+            
+            .invoice-filters {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Teaching Finance Tracker</h1>
+            <p>Track your freelance English teaching income, platform commissions, Spanish IRPF tax, student management, and invoice payments</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('finance')">💰 Finance</button>
+            <button class="tab" onclick="showTab('students')">👥 Students</button>
+            <button class="tab" onclick="showTab('reports')">📊 Reports</button>
+            <button class="tab" onclick="showTab('invoices')">🧾 Invoices</button>
+        </div>
+        
+        <!-- Finance Tab -->
+        <div class="tab-content active" id="finance">
+            <div class="main-content">
+                <!-- Income Section -->
+                <div class="section">
+                    <h2>💰 Add Income</h2>
+                    <form id="incomeForm">
+                        <div class="form-group">
+                            <label for="incomeDate">Date</label>
+                            <input type="date" id="incomeDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="incomeAmount">Gross Amount Earned</label>
+                            <input type="number" id="incomeAmount" step="0.01" placeholder="€50.00" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="platform">Platform</label>
+                            <select id="platform" required>
+                                <option value="">Select platform</option>
+                                <option value="ClassGap">ClassGap</option>
+                                <option value="Tusclasesparticulares">Tusclasesparticulares</option>
+                                <option value="Preply">Preply</option>
+                                <option value="iTalki">iTalki</option>
+                                <option value="Cambly">Cambly</option>
+                                <option value="Verbling">Verbling</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="customPlatform">Other Platform Name</label>
+                            <input type="text" id="customPlatform" placeholder="Enter platform name" style="display: none;">
+                        </div>
+                        <div class="form-group">
+                            <label for="commission">Platform Commission (%)</label>
+                            <input type="number" id="commission" step="0.1" placeholder="20" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentSelect">Student</label>
+                            <select id="studentSelect">
+                                <option value="">Select student or enter manually</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentName">Student/Description</label>
+                            <input type="text" id="studentName" placeholder="Student name or lesson description">
+                        </div>
+                        <button type="submit" class="btn">Add Income</button>
+                    </form>
+                </div>
+                
+                <!-- Expense Section -->
+                <div class="section">
+                    <h2>📋 Add Business Expense</h2>
+                    <form id="expenseForm">
+                        <div class="form-group">
+                            <label for="expenseDate">Date</label>
+                            <input type="date" id="expenseDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseAmount">Amount</label>
+                            <input type="number" id="expenseAmount" step="0.01" placeholder="€25.00" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseCategory">Category</label>
+                            <select id="expenseCategory" required>
+                                <option value="">Select category</option>
+                                <option value="Teaching Materials">Teaching Materials</option>
+                                <option value="Software/Apps">Software/Apps</option>
+                                <option value="Internet/Phone">Internet/Phone</option>
+                                <option value="Office Supplies">Office Supplies</option>
+                                <option value="Professional Development">Professional Development</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseDescription">Description</label>
+                            <input type="text" id="expenseDescription" placeholder="What was this expense for?" required>
+                        </div>
+                        <button type="submit" class="btn btn-expense">Add Expense</button>
+                    </form>
+                </div>
+                
+                <!-- Tax Settings -->
+                <div class="section">
+                    <h2>🏛️ Spanish Tax Settings</h2>
+                    <div class="form-group">
+                        <label for="irpfRate">IRPF Tax Rate (%)</label>
+                        <input type="number" id="irpfRate" step="0.1" placeholder="15" value="15" min="0" max="50">
+                    </div>
+                    <div class="form-group">
+                        <label for="socialSecurity">Monthly Social Security (€)</label>
+                        <input type="number" id="socialSecurity" step="0.01" placeholder="300.00" value="0">
+                    </div>
+                    <p style="font-size: 0.9em; color: #6c757d; margin-top: 10px;">
+                        IRPF is calculated on your net income. Social Security is 100% tax deductible and will be included in your expense calculations.
+                    </p>
+                </div>
+                
+                <!-- Summary Section -->
+                <div class="summary">
+                    <h2>📊 Financial Summary</h2>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <h3>Gross Income</h3>
+                            <div class="amount" id="grossIncome">€0.00</div>
+                        </div>
+                        <div class="summary-item">
+                            <h3>Platform Commissions</h3>
+                            <div class="amount negative" id="totalCommissions">€0.00</div>
+                        </div>
+                        <div class="summary-item">
+                            <h3>Net Income</h3>
+                            <div class="amount positive" id="netIncome">€0.00</div>
+                        </div>
+                        <div class="summary-item">
+                            <h3>Business Expenses</h3>
+                            <div class="amount negative" id="totalExpenses">€0.00</div>
+                        </div>
+                        <div class="summary-item">
+                            <h3>Pending Invoices</h3>
+                            <div class="amount warning" id="pendingInvoices">€0.00</div>
+                        </div>
+                        <div class="summary-item">
+                            <h3>Taxable Profit</h3>
+                            <div class="amount" id="taxableProfit">€0.00</div>
+                        </div>
+                        <div class="summary-item">
+                            <h3>IRPF Tax Due</h3>
+                            <div class="amount negative" id="irpfTax">€0.00</div>
+                        </div>
+                        <div class="summary-item">
+                            <h3>After Tax Profit</h3>
+                            <div class="amount" id="afterTaxProfit">€0.00</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Transactions -->
+                <div class="transactions">
+                    <h2>📋 Recent Transactions</h2>
+                    <div class="transaction-list" id="transactionList">
+                        <p style="text-align: center; color: #7f8c8d; margin-top: 50px;">No transactions yet. Add some income or expenses to get started!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Students Tab -->
+        <div class="tab-content" id="students">
+            <div class="main-content">
+                <div class="section">
+                    <h2>👥 Add New Student</h2>
+                    <form id="studentForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="studentFormName">Student Name *</label>
+                                <input type="text" id="studentFormName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="studentPhone">Phone Number</label>
+                                <input type="tel" id="studentPhone">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentEmail">Email</label>
+                            <input type="email" id="studentEmail">
+                        </div>
+                        <div class="form-group">
+                            <label for="studentAddress">Address</label>
+                            <textarea id="studentAddress" placeholder="Full address for invoices..." rows="3"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="studentRate">Price per Hour (€)</label>
+                                <input type="number" id="studentRate" step="0.01" placeholder="25.00">
+                            </div>
+                            <div class="form-group">
+                                <label for="classType">Type of Class</label>
+                                <select id="classType">
+                                    <option value="General">General</option>
+                                    <option value="Exam Prep">Exam Prep</option>
+                                    <option value="OET">OET</option>
+                                    <option value="Conversation (+21% IVA)">Conversation (+21% IVA)</option>
+                                    <option value="Business/Work Purposes">Business/Work Purposes</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentNotes">Notes</label>
+                            <textarea id="studentNotes" placeholder="Any additional notes about this student..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success">Add Student</button>
+                    </form>
+                </div>
+                
+                <div class="section" style="grid-column: 1 / -1;">
+                    <h2>📚 Student Database</h2>
+                    <div class="students-list" id="studentsList">
+                        <p style="text-align: center; color: #7f8c8d; margin-top: 50px;">No students added yet. Add your first student above!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Reports Tab -->
+        <div class="tab-content" id="reports">
+            <div class="section" style="grid-column: 1 / -1; max-width: none;">
+                <h2>📊 Financial Reports</h2>
+                <div class="form-row" style="margin-bottom: 30px;">
+                    <div class="form-group">
+                        <label for="reportType">Report Type</label>
+                        <select id="reportType" onchange="updateReportOptions()">
+                            <option value="monthly">Monthly Report</option>
+                            <option value="quarterly">Quarterly Report</option>
+                            <option value="annual">Annual Report</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="periodSelection">
+                        <label for="reportPeriod">Select Period</label>
+                        <select id="reportPeriod">
+                        </select>
+                    </div>
+                </div>
+                <button class="btn" onclick="generateReport()" style="width: auto; padding: 12px 30px;">Generate Report</button>
+                
+                <div id="reportContent" style="margin-top: 30px;"></div>
+            </div>
+        </div>
+        
+        <!-- Invoices Tab -->
+        <div class="tab-content" id="invoices">
+            <div class="main-content">
+                <div class="section">
+                    <h2>🧾 Create Invoice</h2>
+                    <form id="invoiceForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="invoiceStudent">Select Student</label>
+                                <select id="invoiceStudent" onchange="populateStudentInfo()" required>
+                                    <option value="">Choose a student</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="invoiceDate">Invoice Date</label>
+                                <input type="date" id="invoiceDate" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Your Business Info -->
+                        <h3 style="color: #2c3e50; margin: 20px 0 15px 0;">Your Business Information</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="businessName">Business Name</label>
+                                <input type="text" id="businessName" placeholder="Your Name or Business Name">
+                            </div>
+                            <div class="form-group">
+                                <label for="businessNIF">NIF/NIE</label>
+                                <input type="text" id="businessNIF" placeholder="Your tax ID">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="businessAddress">Your Address</label>
+                            <textarea id="businessAddress" placeholder="Your full business address..." rows="3"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="businessEmail">Email</label>
+                                <input type="email" id="businessEmail" placeholder="your@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="businessPhone">Phone</label>
+                                <input type="tel" id="businessPhone" placeholder="Your phone number">
+                            </div>
+                        </div>
+                        
+                        <!-- Invoice Details -->
+                        <h3 style="color: #2c3e50; margin: 20px 0 15px 0;">Invoice Details</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="invoiceNumber">Invoice Number</label>
+                                <input type="text" id="invoiceNumber" placeholder="INV-001" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="dueDate">Due Date</label>
+                                <input type="date" id="dueDate">
+                            </div>
+                        </div>
+                        
+                        <!-- Service Details -->
+                        <h3 style="color: #2c3e50; margin: 20px 0 15px 0;">Services</h3>
+                        <div id="servicesContainer">
+                            <div class="service-row">
+                                <div class="form-row" style="align-items: end;">
+                                    <div class="form-group">
+                                        <label>Description</label>
+                                        <input type="text" class="service-description" placeholder="English lessons - General" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Hours</label>
+                                        <input type="number" class="service-hours" step="0.5" placeholder="1" onchange="calculateInvoiceTotal()" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Rate (€/hour)</label>
+                                        <input type="number" class="service-rate" step="0.01" placeholder="25.00" onchange="calculateInvoiceTotal()" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>IVA (%)</label>
+                                        <input type="number" class="service-iva" step="0.1" placeholder="0" onchange="calculateInvoiceTotal()">
+                                    </div>
+                                    <button type="button" class="btn btn-expense" style="width: auto; padding: 8px 12px;" onclick="removeService(this)">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-success" onclick="addService()" style="width: auto; margin-bottom: 20px;">Add Another Service</button>
+                        
+                        <!-- Invoice Total -->
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                            <div style="text-align: right;">
+                                <div style="font-size: 1.1em; margin-bottom: 5px;">Subtotal: €<span id="invoiceSubtotal">0.00</span></div>
+                                <div style="font-size: 1.1em; margin-bottom: 5px;">IVA: €<span id="invoiceIVA">0.00</span></div>
+                                <div style="font-size: 1.3em; font-weight: bold; border-top: 2px solid #dee2e6; padding-top: 10px;">
+                                    Total: €<span id="invoiceTotal">0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="invoiceNotes">Additional Notes</label>
+                            <textarea id="invoiceNotes" placeholder="Payment terms, bank details, etc..." rows="3"></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn">Generate Invoice</button>
+                    </form>
+                </div>
+                
+                <div class="section" style="grid-column: 1 / -1;">
+                    <h2>📋 Invoice History</h2>
+                    
+                    <!-- Invoice Filters -->
+                    <div class="invoice-filters">
+                        <div class="filter-group">
+                            <label for="statusFilter">Status:</label>
+                            <select id="statusFilter" onchange="updateInvoiceHistory()">
+                                <option value="all">All Invoices</option>
+                                <option value="paid">Paid</option>
+                                <option value="pending">Pending</option>
+                                <option value="overdue">Overdue</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="studentFilter">Student:</label>
+                            <select id="studentFilter" onchange="updateInvoiceHistory()">
+                                <option value="all">All Students</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <span>Quick Actions:</span>
+                            <button class="btn" style="width: auto; padding: 8px 15px; font-size: 12px;" onclick="markAllOverdueInvoices()">
+                                Mark Overdue
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="invoiceHistory" class="transaction-list">
+                        <p style="text-align: center; color: #7f8c8d; margin-top: 50px;">No invoices created yet.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Student Modal -->
+    <div id="editStudentModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Student</h2>
+            <form id="editStudentForm">
+                <input type="hidden" id="editStudentId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editStudentName">Student Name *</label>
+                        <input type="text" id="editStudentName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editStudentPhone">Phone Number</label>
+                        <input type="tel" id="editStudentPhone">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="editStudentEmail">Email</label>
+                    <input type="email" id="editStudentEmail">
+                </div>
+                <div class="form-group">
+                    <label for="editStudentAddress">Address</label>
+                    <textarea id="editStudentAddress" rows="3"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editStudentRate">Price per Hour (€)</label>
+                        <input type="number" id="editStudentRate" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="editClassType">Type of Class</label>
+                        <select id="editClassType">
+                            <option value="General">General</option>
+                            <option value="Exam Prep">Exam Prep</option>
+                            <option value="OET">OET</option>
+                            <option value="Conversation (+21% IVA)">Conversation (+21% IVA)</option>
+                            <option value="Business/Work Purposes">Business/Work Purposes</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="editStudentNotes">Notes</label>
+                    <textarea id="editStudentNotes"></textarea>
+                </div>
+                <button type="submit" class="btn btn-success">Update Student</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Data storage
+        let transactions = [];
+        let students = [];
+        let invoices = [];
+        
+        // Load data from localStorage
+        function loadData() {
+            const storedTransactions = localStorage.getItem('teachingFinances');
+            const storedStudents = localStorage.getItem('teachingStudents');
+            const storedInvoices = localStorage.getItem('teachingInvoices');
+            if (storedTransactions) {
+                transactions = JSON.parse(storedTransactions);
+            }
+            if (storedStudents) {
+                students = JSON.parse(storedStudents);
+            }
+            if (storedInvoices) {
+                invoices = JSON.parse(storedInvoices);
+                // Ensure all invoices have a status and paidDate field
+                invoices.forEach(invoice => {
+                    if (!invoice.status) invoice.status = 'pending';
+                    if (!invoice.paidDate) invoice.paidDate = null;
+                });
+            }
+        }
+        
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('teachingFinances', JSON.stringify(transactions));
+            localStorage.setItem('teachingStudents', JSON.stringify(students));
+            localStorage.setItem('teachingInvoices', JSON.stringify(invoices));
+        }
+        
+        // Tab switching
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`.tab[onclick="showTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            
+            if (tabName === 'students') {
+                updateStudentsList();
+            } else if (tabName === 'reports') {
+                updateReportOptions();
+            } else if (tabName === 'invoices') {
+                updateInvoiceStudentDropdown();
+                updateInvoiceHistory();
+                updateInvoiceFilters();
+                setInvoiceDefaults();
+            }
+        }
+        
+        // Invoice status functions
+        function markInvoiceAsPaid(invoiceId) {
+            const invoice = invoices.find(inv => inv.id === invoiceId);
+            if (invoice) {
+                invoice.status = 'paid';
+                invoice.paidDate = new Date().toISOString().split('T')[0];
+                saveData();
+                updateInvoiceHistory();
+                updateDisplay(); // Update financial summary
+            }
+        }
+        
+        function markInvoiceAsUnpaid(invoiceId) {
+            const invoice = invoices.find(inv => inv.id === invoiceId);
+            if (invoice) {
+                invoice.status = 'pending';
+                invoice.paidDate = null;
+                saveData();
+                updateInvoiceHistory();
+                updateDisplay(); // Update financial summary
+            }
+        }
+        
+        function getInvoiceStatus(invoice) {
+            if (invoice.status === 'paid') return 'paid';
+            
+            const today = new Date();
+            const dueDate = new Date(invoice.dueDate);
+            
+            if (dueDate < today) {
+                return 'overdue';
+            }
+            
+            return 'pending';
+        }
+        
+        function markAllOverdueInvoices() {
+            const today = new Date();
+            let updatedCount = 0;
+            
+            invoices.forEach(invoice => {
+                if (invoice.status !== 'paid') {
+                    const dueDate = new Date(invoice.dueDate);
+                    if (dueDate < today) {
+                        invoice.status = 'overdue';
+                        updatedCount++;
+                    }
+                }
+            });
+            
+            if (updatedCount > 0) {
+                saveData();
+                updateInvoiceHistory();
+                alert(`${updatedCount} invoice${updatedCount !== 1 ? 's' : ''} marked as overdue.`);
+            } else {
+                alert('No invoices to mark as overdue.');
+            }
+        }
+        
+        // Platform selection logic
+        document.getElementById('platform').addEventListener('change', function() {
+            const customField = document.getElementById('customPlatform');
+            if (this.value === 'Other') {
+                customField.style.display = 'block';
+                customField.required = true;
+            } else {
+                customField.style.display = 'none';
+                customField.required = false;
+                customField.value = '';
+            }
+        });
+        
+        // Student selection logic
+        document.getElementById('studentSelect').addEventListener('change', function() {
+            if (this.value) {
+                const student = students.find(s => s.id == this.value);
+                if (student) {
+                    document.getElementById('studentName').value = student.name;
+                }
+            }
+        });
+        
+        // Add student
+        document.getElementById('studentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const student = {
+                id: Date.now(),
+                name: document.getElementById('studentFormName').value,
+                phone: document.getElementById('studentPhone').value,
+                email: document.getElementById('studentEmail').value,
+                address: document.getElementById('studentAddress').value,
+                rate: parseFloat(document.getElementById('studentRate').value) || 0,
+                classType: document.getElementById('classType').value,
+                notes: document.getElementById('studentNotes').value
+            };
+            
+            students.push(student);
+            saveData();
+            updateStudentDropdown();
+            updateStudentsList();
+            updateInvoiceFilters();
+            this.reset();
+        });
+        
+        // Add income transaction
+        document.getElementById('incomeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const grossAmount = parseFloat(document.getElementById('incomeAmount').value);
+            const commissionRate = parseFloat(document.getElementById('commission').value) / 100;
+            const commissionAmount = grossAmount * commissionRate;
+            const netAmount = grossAmount - commissionAmount;
+            
+            let platformName = document.getElementById('platform').value;
+            if (platformName === 'Other') {
+                platformName = document.getElementById('customPlatform').value;
+            }
+            
+            const transaction = {
+                id: Date.now(),
+                type: 'income',
+                date: document.getElementById('incomeDate').value,
+                grossAmount: grossAmount,
+                commission: commissionAmount,
+                netAmount: netAmount,
+                platform: platformName,
+                student: document.getElementById('studentName').value,
+                commissionRate: document.getElementById('commission').value
+            };
+            
+            transactions.push(transaction);
+            saveData();
+            updateDisplay();
+            this.reset();
+            
+            // Reset platform field
+            document.getElementById('customPlatform').style.display = 'none';
+            document.getElementById('customPlatform').required = false;
+        });
+        
+        // Add expense transaction
+        document.getElementById('expenseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const transaction = {
+                id: Date.now(),
+                type: 'expense',
+                date: document.getElementById('expenseDate').value,
+                amount: parseFloat(document.getElementById('expenseAmount').value),
+                category: document.getElementById('expenseCategory').value,
+                description: document.getElementById('expenseDescription').value
+            };
+            
+            transactions.push(transaction);
+            saveData();
+            updateDisplay();
+            this.reset();
+        });
+        
+        // Delete transaction
+        function deleteTransaction(id) {
+            transactions = transactions.filter(t => t.id !== id);
+            saveData();
+            updateDisplay();
+        }
+        
+        // Delete student
+        function deleteStudent(id) {
+            if (confirm('Are you sure you want to delete this student?')) {
+                students = students.filter(s => s.id !== id);
+                saveData();
+                updateStudentDropdown();
+                updateStudentsList();
+                updateInvoiceFilters();
+            }
+        }
+        
+        // Edit student
+        function editStudent(id) {
+            const student = students.find(s => s.id === id);
+            if (student) {
+                document.getElementById('editStudentId').value = student.id;
+                document.getElementById('editStudentName').value = student.name;
+                document.getElementById('editStudentPhone').value = student.phone || '';
+                document.getElementById('editStudentEmail').value = student.email || '';
+                document.getElementById('editStudentAddress').value = student.address || '';
+                document.getElementById('editStudentRate').value = student.rate || '';
+                document.getElementById('editClassType').value = student.classType;
+                document.getElementById('editStudentNotes').value = student.notes || '';
+                document.getElementById('editStudentModal').style.display = 'block';
+            }
+        }
+        
+        // Edit student form
+        document.getElementById('editStudentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const id = parseInt(document.getElementById('editStudentId').value);
+            const studentIndex = students.findIndex(s => s.id === id);
+            
+            if (studentIndex !== -1) {
+                students[studentIndex] = {
+                    id: id,
+                    name: document.getElementById('editStudentName').value,
+                    phone: document.getElementById('editStudentPhone').value,
+                    email: document.getElementById('editStudentEmail').value,
+                    address: document.getElementById('editStudentAddress').value,
+                    rate: parseFloat(document.getElementById('editStudentRate').value) || 0,
+                    classType: document.getElementById('editClassType').value,
+                    notes: document.getElementById('editStudentNotes').value
+                };
+                
+                saveData();
+                updateStudentDropdown();
+                updateStudentsList();
+                updateInvoiceFilters();
+                document.getElementById('editStudentModal').style.display = 'none';
+            }
+        });
+        
+        // Modal close
+        document.querySelector('.close').onclick = function() {
+            document.getElementById('editStudentModal').style.display = 'none';
+        }
+        
+        window.onclick = function(event) {
+            const modal = document.getElementById('editStudentModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        // Update student dropdown
+        function updateStudentDropdown() {
+            const select = document.getElementById('studentSelect');
+            select.innerHTML = '<option value="">Select student or enter manually</option>';
+            
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.id;
+                option.textContent = `${student.name} (€${student.rate}/hr)`;
+                select.appendChild(option);
+            });
+        }
+        
+        // Update students list
+        function updateStudentsList() {
+            const list = document.getElementById('studentsList');
+            
+            if (students.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #7f8c8d; margin-top: 50px;">No students added yet. Add your first student above!</p>';
+            } else {
+                list.innerHTML = students.map(student => {
+                    const hasIVA = student.classType.includes('+21% IVA');
+                    return `
+                        <div class="student-card">
+                            <div class="student-header">
+                                <div class="student-name">${student.name}</div>
+                                <div>
+                                    ${hasIVA ? '<span class="iva-indicator">+21% IVA</span>' : ''}
+                                    <button class="btn" style="width: auto; margin: 0 5px; padding: 8px 15px; font-size: 14px;" onclick="editStudent(${student.id})">Edit</button>
+                                    <button class="delete-btn" onclick="deleteStudent(${student.id})">Delete</button>
+                                </div>
+                            </div>
+                            <div class="student-details">
+                                <div><strong>Phone:</strong> ${student.phone || 'Not provided'}</div>
+                                <div><strong>Email:</strong> ${student.email || 'Not provided'}</div>
+                                <div><strong>Address:</strong> ${student.address || 'Not provided'}</div>
+                                <div><strong>Rate:</strong> €${student.rate.toFixed(2)}/hour</div>
+                                <div><strong>Class Type:</strong> ${student.classType}</div>
+                            </div>
+                            ${student.notes ? `<div class="student-notes"><strong>Notes:</strong> ${student.notes}</div>` : ''}
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+        
+        // Update invoice filters
+        function updateInvoiceFilters() {
+            const studentFilter = document.getElementById('studentFilter');
+            studentFilter.innerHTML = '<option value="all">All Students</option>';
+            
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.id;
+                option.textContent = student.name;
+                studentFilter.appendChild(option);
+            });
+        }
+        
+        // Update display
+        function updateDisplay() {
+            const income = transactions.filter(t => t.type === 'income');
+            const expenses = transactions.filter(t => t.type === 'expense');
+            
+            const grossIncome = income.reduce((sum, t) => sum + t.grossAmount, 0);
+            const totalCommissions = income.reduce((sum, t) => sum + t.commission, 0);
+            const netIncome = income.reduce((sum, t) => sum + t.netAmount, 0);
+            const totalExpenses = expenses.reduce((sum, t) => sum + t.amount, 0);
+            
+            // Calculate pending invoices total
+            const pendingInvoicesTotal = invoices
+                .filter(inv => inv.status !== 'paid')
+                .reduce((sum, inv) => sum + inv.total, 0);
+            
+            // Add social security as deductible expense
+            const socialSecurityMonthly = parseFloat(document.getElementById('socialSecurity').value) || 0;
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth() + 1; // Get current month (1-12)
+            const totalSocialSecurity = socialSecurityMonthly * currentMonth; // Total SS paid this year
+            
+            const totalDeductibleExpenses = totalExpenses + totalSocialSecurity;
+            const taxableProfit = netIncome - totalDeductibleExpenses;
+            
+            // Calculate IRPF tax
+            const irpfRate = parseFloat(document.getElementById('irpfRate').value) / 100;
+            const irpfTax = Math.max(0, netIncome * irpfRate); // Applied to net income
+            const afterTaxProfit = taxableProfit - irpfTax;
+            
+            // Update summary
+            document.getElementById('grossIncome').textContent = `€${grossIncome.toFixed(2)}`;
+            document.getElementById('totalCommissions').textContent = `€${totalCommissions.toFixed(2)}`;
+            document.getElementById('netIncome').textContent = `€${netIncome.toFixed(2)}`;
+            document.getElementById('totalExpenses').textContent = `€${totalDeductibleExpenses.toFixed(2)}`;
+            document.getElementById('pendingInvoices').textContent = `€${pendingInvoicesTotal.toFixed(2)}`;
+            document.getElementById('irpfTax').textContent = `€${irpfTax.toFixed(2)}`;
+            
+            const profitElement = document.getElementById('taxableProfit');
+            profitElement.textContent = `€${taxableProfit.toFixed(2)}`;
+            profitElement.className = taxableProfit >= 0 ? 'amount positive' : 'amount negative';
+            
+            const afterTaxElement = document.getElementById('afterTaxProfit');
+            afterTaxElement.textContent = `€${afterTaxProfit.toFixed(2)}`;
+            afterTaxElement.className = afterTaxProfit >= 0 ? 'amount positive' : 'amount negative';
+            
+            // Update transaction list
+            const transactionList = document.getElementById('transactionList');
+            if (transactions.length === 0) {
+                transactionList.innerHTML = '<p style="text-align: center; color: #7f8c8d; margin-top: 50px;">No transactions yet. Add some income or expenses to get started!</p>';
+            } else {
+                const sortedTransactions = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+                transactionList.innerHTML = sortedTransactions.map(t => {
+                    if (t.type === 'income') {
+                        return `
+                            <div class="transaction-item">
+                                <div class="transaction-info">
+                                    <strong>${t.platform}</strong> - ${t.student || 'Teaching'}<br>
+                                    <small>${t.date} | Commission: ${t.commissionRate}% | Gross: €${t.grossAmount.toFixed(2)}</small>
+                                </div>
+                                <div class="transaction-amount positive">+€${t.netAmount.toFixed(2)}</div>
+                                <button class="delete-btn" onclick="deleteTransaction(${t.id})">×</button>
+                            </div>
+                        `;
+                    } else {
+                        return `
+                            <div class="transaction-item">
+                                <div class="transaction-info">
+                                    <strong>${t.category}</strong> - ${t.description}<br>
+                                    <small>${t.date}</small>
+                                </div>
+                                <div class="transaction-amount negative">-€${t.amount.toFixed(2)}</div>
+                                <button class="delete-btn" onclick="deleteTransaction(${t.id})">×</button>
+                            </div>
+                        `;
+                    }
+                }).join('');
+            }
+        }
+        
+        // Invoice functions
+        function updateInvoiceStudentDropdown() {
+            const select = document.getElementById('invoiceStudent');
+            select.innerHTML = '<option value="">Choose a student</option>';
+            
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.id;
+                option.textContent = student.name;
+                select.appendChild(option);
+            });
+        }
+        
+        function populateStudentInfo() {
+            const studentId = document.getElementById('invoiceStudent').value;
+            if (!studentId) return;
+            
+            const student = students.find(s => s.id == studentId);
+            if (!student) return;
+            
+            // Set service details based on student info
+            const firstServiceRow = document.querySelector('.service-row');
+            const descriptionInput = firstServiceRow.querySelector('.service-description');
+            const rateInput = firstServiceRow.querySelector('.service-rate');
+            const ivaInput = firstServiceRow.querySelector('.service-iva');
+            
+            descriptionInput.value = `English lessons - ${student.classType}`;
+            rateInput.value = student.rate;
+            
+            // Set IVA if conversation class
+            if (student.classType.includes('+21% IVA')) {
+                ivaInput.value = 21;
+            } else {
+                ivaInput.value = 0;
+            }
+            
+            calculateInvoiceTotal();
+        }
+        
+        function addService() {
+            const container = document.getElementById('servicesContainer');
+            const newService = document.createElement('div');
+            newService.className = 'service-row';
+            newService.innerHTML = `
+                <div class="form-row" style="align-items: end;">
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input type="text" class="service-description" placeholder="English lessons - General" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Hours</label>
+                        <input type="number" class="service-hours" step="0.5" placeholder="1" onchange="calculateInvoiceTotal()" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Rate (€/hour)</label>
+                        <input type="number" class="service-rate" step="0.01" placeholder="25.00" onchange="calculateInvoiceTotal()" required>
+                    </div>
+                    <div class="form-group">
+                        <label>IVA (%)</label>
+                        <input type="number" class="service-iva" step="0.1" placeholder="0" onchange="calculateInvoiceTotal()">
+                    </div>
+                    <button type="button" class="btn btn-expense" style="width: auto; padding: 8px 12px;" onclick="removeService(this)">Remove</button>
+                </div>
+            `;
+            container.appendChild(newService);
+        }
+        
+        function removeService(button) {
+            const serviceRows = document.querySelectorAll('.service-row');
+            if (serviceRows.length > 1) {
+                button.closest('.service-row').remove();
+                calculateInvoiceTotal();
+            }
+        }
+        
+        function calculateInvoiceTotal() {
+            const serviceRows = document.querySelectorAll('.service-row');
+            let subtotal = 0;
+            let totalIVA = 0;
+            
+            serviceRows.forEach(row => {
+                const hours = parseFloat(row.querySelector('.service-hours').value) || 0;
+                const rate = parseFloat(row.querySelector('.service-rate').value) || 0;
+                const ivaPercent = parseFloat(row.querySelector('.service-iva').value) || 0;
+                
+                const lineTotal = hours * rate;
+                const lineIVA = lineTotal * (ivaPercent / 100);
+                
+                subtotal += lineTotal;
+                totalIVA += lineIVA;
+            });
+            
+            const total = subtotal + totalIVA;
+            
+            document.getElementById('invoiceSubtotal').textContent = subtotal.toFixed(2);
+            document.getElementById('invoiceIVA').textContent = totalIVA.toFixed(2);
+            document.getElementById('invoiceTotal').textContent = total.toFixed(2);
+        }
+        
+        function setInvoiceDefaults() {
+            const today = new Date();
+            const dueDate = new Date(today);
+            dueDate.setDate(today.getDate() + 30); // 30 days from today
+            
+            document.getElementById('invoiceDate').value = today.toISOString().split('T')[0];
+            document.getElementById('dueDate').value = dueDate.toISOString().split('T')[0];
+            
+            // Generate invoice number
+            const invoiceCount = invoices.length + 1;
+            const year = today.getFullYear();
+            document.getElementById('invoiceNumber').value = `INV-${year}-${String(invoiceCount).padStart(3, '0')}`;
+        }
+        
+        // Invoice form submission
+        document.getElementById('invoiceForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const studentId = document.getElementById('invoiceStudent').value;
+            const student = students.find(s => s.id == studentId);
+            
+            // Collect services
+            const serviceRows = document.querySelectorAll('.service-row');
+            const services = [];
+            let subtotal = 0;
+            let totalIVA = 0;
+            
+            serviceRows.forEach(row => {
+                const description = row.querySelector('.service-description').value;
+                const hours = parseFloat(row.querySelector('.service-hours').value) || 0;
+                const rate = parseFloat(row.querySelector('.service-rate').value) || 0;
+                const ivaPercent = parseFloat(row.querySelector('.service-iva').value) || 0;
+                
+                const lineTotal = hours * rate;
+                const lineIVA = lineTotal * (ivaPercent / 100);
+                
+                services.push({
+                    description,
+                    hours,
+                    rate,
+                    ivaPercent,
+                    lineTotal,
+                    lineIVA
+                });
+                
+                subtotal += lineTotal;
+                totalIVA += lineIVA;
+            });
+            
+            const invoice = {
+                id: Date.now(),
+                number: document.getElementById('invoiceNumber').value,
+                date: document.getElementById('invoiceDate').value,
+                dueDate: document.getElementById('dueDate').value,
+                student: {
+                    id: studentId,
+                    name: student.name,
+                    email: student.email,
+                    phone: student.phone,
+                    address: student.address
+                },
+                business: {
+                    name: document.getElementById('businessName').value,
+                    nif: document.getElementById('businessNIF').value,
+                    address: document.getElementById('businessAddress').value,
+                    email: document.getElementById('businessEmail').value,
+                    phone: document.getElementById('businessPhone').value
+                },
+                services: services,
+                subtotal: subtotal,
+                totalIVA: totalIVA,
+                total: subtotal + totalIVA,
+                notes: document.getElementById('invoiceNotes').value,
+                status: 'pending',
+                paidDate: null
+            };
+            
+            invoices.push(invoice);
+            saveData();
+            updateInvoiceHistory();
+            updateDisplay(); // Update financial summary
+            
+            // Show the generated invoice
+            showInvoicePreview(invoice);
+        });
+        
+        function showInvoicePreview(invoice) {
+            const previewWindow = window.open('', '_blank', 'width=800,height=900');
+            const invoiceHTML = generateInvoiceHTML(invoice);
+            
+            previewWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Invoice ${invoice.number}</title>
+                        <style>
+                            body { 
+                                font-family: Arial, sans-serif; 
+                                margin: 20px; 
+                                color: #333;
+                                line-height: 1.6;
+                            }
+                            .invoice-header { 
+                                display: flex; 
+                                justify-content: space-between; 
+                                margin-bottom: 30px; 
+                                border-bottom: 2px solid #333;
+                                padding-bottom: 20px;
+                            }
+                            .invoice-title { 
+                                font-size: 2em; 
+                                font-weight: bold; 
+                                color: #2c3e50;
+                            }
+                            .invoice-info { 
+                                text-align: right; 
+                            }
+                            .business-info, .client-info { 
+                                margin-bottom: 30px; 
+                            }
+                            .business-info h3, .client-info h3 { 
+                                margin-bottom: 10px; 
+                                color: #2c3e50;
+                                border-bottom: 1px solid #dee2e6;
+                                padding-bottom: 5px;
+                            }
+                            table { 
+                                width: 100%; 
+                                border-collapse: collapse; 
+                                margin: 20px 0; 
+                            }
+                            th, td { 
+                                padding: 12px; 
+                                text-align: left; 
+                                border-bottom: 1px solid #dee2e6; 
+                            }
+                            th { 
+                                background: #f8f9fa; 
+                                font-weight: bold; 
+                            }
+                            .total-row { 
+                                font-weight: bold; 
+                                background: #f8f9fa; 
+                            }
+                            .text-right { 
+                                text-align: right; 
+                            }
+                            .invoice-notes {
+                                margin-top: 30px;
+                                padding: 20px;
+                                background: #f8f9fa;
+                                border-radius: 5px;
+                            }
+                            .print-button {
+                                background: #3498db;
+                                color: white;
+                                padding: 10px 20px;
+                                border: none;
+                                border-radius: 5px;
+                                cursor: pointer;
+                                margin: 20px 0;
+                            }
+                            @media print {
+                                .print-button { display: none; }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <button class="print-button" onclick="window.print()">🖨️ Print Invoice</button>
+                        ${invoiceHTML}
+                    </body>
+                </html>
+            `);
+            previewWindow.document.close();
+        }
+        
+        function generateInvoiceHTML(invoice) {
+            const invoiceDate = new Date(invoice.date).toLocaleDateString('en-GB');
+            const dueDate = new Date(invoice.dueDate).toLocaleDateString('en-GB');
+            
+            return `
+                <div class="invoice-header">
+                    <div class="invoice-title">INVOICE</div>
+                    <div class="invoice-info">
+                        <strong>Invoice #:</strong> ${invoice.number}<br>
+                        <strong>Date:</strong> ${invoiceDate}<br>
+                        <strong>Due Date:</strong> ${dueDate}
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
+                    <div class="business-info">
+                        <h3>From:</h3>
+                        <strong>${invoice.business.name}</strong><br>
+                        ${invoice.business.nif ? `NIF: ${invoice.business.nif}<br>` : ''}
+                        ${invoice.business.address.replace(/\n/g, '<br>')}<br>
+                        ${invoice.business.email ? `${invoice.business.email}<br>` : ''}
+                        ${invoice.business.phone ? `${invoice.business.phone}` : ''}
+                    </div>
+                    
+                    <div class="client-info">
+                        <h3>To:</h3>
+                        <strong>${invoice.student.name}</strong><br>
+                        ${invoice.student.address ? `${invoice.student.address.replace(/\n/g, '<br>')}<br>` : ''}
+                        ${invoice.student.email ? `${invoice.student.email}<br>` : ''}
+                        ${invoice.student.phone ? `${invoice.student.phone}` : ''}
+                    </div>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th class="text-right">Hours</th>
+                            <th class="text-right">Rate (€/hr)</th>
+                            <th class="text-right">IVA %</th>
+                            <th class="text-right">Subtotal</th>
+                            <th class="text-right">IVA</th>
+                            <th class="text-right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${invoice.services.map(service => `
+                            <tr>
+                                <td>${service.description}</td>
+                                <td class="text-right">${service.hours}</td>
+                                <td class="text-right">€${service.rate.toFixed(2)}</td>
+                                <td class="text-right">${service.ivaPercent}%</td>
+                                <td class="text-right">€${service.lineTotal.toFixed(2)}</td>
+                                <td class="text-right">€${service.lineIVA.toFixed(2)}</td>
+                                <td class="text-right">€${(service.lineTotal + service.lineIVA).toFixed(2)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td colspan="6"><strong>Subtotal:</strong></td>
+                            <td class="text-right"><strong>€${invoice.subtotal.toFixed(2)}</strong></td>
+                        </tr>
+                        <tr class="total-row">
+                            <td colspan="6"><strong>Total IVA:</strong></td>
+                            <td class="text-right"><strong>€${invoice.totalIVA.toFixed(2)}</strong></td>
+                        </tr>
+                        <tr class="total-row" style="font-size: 1.2em;">
+                            <td colspan="6"><strong>TOTAL:</strong></td>
+                            <td class="text-right"><strong>€${invoice.total.toFixed(2)}</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                
+                ${invoice.notes ? `
+                    <div class="invoice-notes">
+                        <h4>Notes:</h4>
+                        <p>${invoice.notes.replace(/\n/g, '<br>')}</p>
+                    </div>
+                ` : ''}
+            `;
+        }
+        
+        function updateInvoiceHistory() {
+            const historyDiv = document.getElementById('invoiceHistory');
+            
+            if (invoices.length === 0) {
+                historyDiv.innerHTML = '<p style="text-align: center; color: #7f8c8d; margin-top: 50px;">No invoices created yet.</p>';
+                return;
+            }
+            
+            // Get filter values
+            const statusFilter = document.getElementById('statusFilter').value;
+            const studentFilter = document.getElementById('studentFilter').value;
+            
+            // Filter invoices
+            let filteredInvoices = [...invoices];
+            
+            if (statusFilter !== 'all') {
+                filteredInvoices = filteredInvoices.filter(invoice => {
+                    const currentStatus = getInvoiceStatus(invoice);
+                    return currentStatus === statusFilter;
+                });
+            }
+            
+            if (studentFilter !== 'all') {
+                filteredInvoices = filteredInvoices.filter(invoice => {
+                    return invoice.student.id == studentFilter;
+                });
+            }
+            
+            // Sort by date (newest first)
+            const sortedInvoices = filteredInvoices.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            if (sortedInvoices.length === 0) {
+                historyDiv.innerHTML = '<p style="text-align: center; color: #7f8c8d; margin-top: 50px;">No invoices match the selected filters.</p>';
+                return;
+            }
+            
+            historyDiv.innerHTML = sortedInvoices.map(invoice => {
+                const currentStatus = getInvoiceStatus(invoice);
+                let statusClass = '';
+                let statusText = '';
+                
+                switch (currentStatus) {
+                    case 'paid':
+                        statusClass = 'status-paid';
+                        statusText = 'Paid';
+                        break;
+                    case 'overdue':
+                        statusClass = 'status-overdue';
+                        statusText = 'Overdue';
+                        break;
+                    default:
+                        statusClass = 'status-pending';
+                        statusText = 'Pending';
+                }
+                
+                return `
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <strong>${invoice.number}</strong> - ${invoice.student.name}
+                            <span class="status-badge ${statusClass}">${statusText}</span><br>
+                            <small>
+                                ${new Date(invoice.date).toLocaleDateString()} | Due: ${new Date(invoice.dueDate).toLocaleDateString()}
+                                ${invoice.paidDate ? ` | Paid: ${new Date(invoice.paidDate).toLocaleDateString()}` : ''}
+                            </small>
+                        </div>
+                        <div class="transaction-amount positive">€${invoice.total.toFixed(2)}</div>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            ${currentStatus !== 'paid' ? 
+                                `<button class="btn-paid" onclick="markInvoiceAsPaid(${invoice.id})">Mark Paid</button>` : 
+                                `<button class="btn-unpaid" onclick="markInvoiceAsUnpaid(${invoice.id})">Mark Unpaid</button>`
+                            }
+                            <button class="btn" style="width: auto; margin: 0; padding: 8px 15px; font-size: 12px;" onclick="showInvoicePreview(${JSON.stringify(invoice).replace(/"/g, '&quot;')})">View</button>
+                            <button class="delete-btn" onclick="deleteInvoice(${invoice.id})">×</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function deleteInvoice(id) {
+            if (confirm('Are you sure you want to delete this invoice?')) {
+                invoices = invoices.filter(inv => inv.id !== id);
+                saveData();
+                updateInvoiceHistory();
+                updateDisplay(); // Update financial summary
+            }
+        }
+        
+        // Social security change listener
+        document.getElementById('socialSecurity').addEventListener('input', updateDisplay);
+        
+        // IRPF rate change listener
+        document.getElementById('irpfRate').addEventListener('change', updateDisplay);
+        
+        // Report functions
+        function updateReportOptions() {
+            const reportType = document.getElementById('reportType').value;
+            const periodSelect = document.getElementById('reportPeriod');
+            const currentYear = new Date().getFullYear();
+            
+            periodSelect.innerHTML = '';
+            
+            if (reportType === 'monthly') {
+                const months = [
+                    'January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'
+                ];
+                months.forEach((month, index) => {
+                    const option = document.createElement('option');
+                    option.value = `${currentYear}-${String(index + 1).padStart(2, '0')}`;
+                    option.textContent = `${month} ${currentYear}`;
+                    periodSelect.appendChild(option);
+                });
+            } else if (reportType === 'quarterly') {
+                const quarters = ['Q1 (Jan-Mar)', 'Q2 (Apr-Jun)', 'Q3 (Jul-Sep)', 'Q4 (Oct-Dec)'];
+                quarters.forEach((quarter, index) => {
+                    const option = document.createElement('option');
+                    option.value = `${currentYear}-Q${index + 1}`;
+                    option.textContent = `${quarter} ${currentYear}`;
+                    periodSelect.appendChild(option);
+                });
+            } else if (reportType === 'annual') {
+                for (let year = currentYear; year >= currentYear - 5; year--) {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    periodSelect.appendChild(option);
+                }
+            }
+        }
+        
+        function generateReport() {
+            const reportType = document.getElementById('reportType').value;
+            const period = document.getElementById('reportPeriod').value;
+            const reportContent = document.getElementById('reportContent');
+            
+            let filteredTransactions = [];
+            let filteredInvoices = [];
+            let periodName = '';
+            
+            if (reportType === 'monthly') {
+                const [year, month] = period.split('-');
+                filteredTransactions = transactions.filter(t => {
+                    const transactionDate = new Date(t.date);
+                    return transactionDate.getFullYear() == year && (transactionDate.getMonth() + 1) == parseInt(month);
+                });
+                filteredInvoices = invoices.filter(inv => {
+                    const invoiceDate = new Date(inv.date);
+                    return invoiceDate.getFullYear() == year && (invoiceDate.getMonth() + 1) == parseInt(month);
+                });
+                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'];
+                periodName = `${monthNames[parseInt(month) - 1]} ${year}`;
+            } else if (reportType === 'quarterly') {
+                const [year, quarter] = period.split('-');
+                const qNum = parseInt(quarter.substring(1));
+                const startMonth = (qNum - 1) * 3 + 1;
+                const endMonth = qNum * 3;
+                
+                filteredTransactions = transactions.filter(t => {
+                    const transactionDate = new Date(t.date);
+                    const month = transactionDate.getMonth() + 1;
+                    return transactionDate.getFullYear() == year && month >= startMonth && month <= endMonth;
+                });
+                filteredInvoices = invoices.filter(inv => {
+                    const invoiceDate = new Date(inv.date);
+                    const month = invoiceDate.getMonth() + 1;
+                    return invoiceDate.getFullYear() == year && month >= startMonth && month <= endMonth;
+                });
+                periodName = `${quarter} ${year}`;
+            } else if (reportType === 'annual') {
+                const year = parseInt(period);
+                filteredTransactions = transactions.filter(t => {
+                    const transactionDate = new Date(t.date);
+                    return transactionDate.getFullYear() == year;
+                });
+                filteredInvoices = invoices.filter(inv => {
+                    const invoiceDate = new Date(inv.date);
+                    return invoiceDate.getFullYear() == year;
+                });
+                periodName = `${year}`;
+            }
+            
+            // Calculate report data
+            const income = filteredTransactions.filter(t => t.type === 'income');
+            const expenses = filteredTransactions.filter(t => t.type === 'expense');
+            
+            const grossIncome = income.reduce((sum, t) => sum + t.grossAmount, 0);
+            const totalCommissions = income.reduce((sum, t) => sum + t.commission, 0);
+            const netIncome = income.reduce((sum, t) => sum + t.netAmount, 0);
+            const totalExpenses = expenses.reduce((sum, t) => sum + t.amount, 0);
+            
+            // Calculate invoice data
+            const totalInvoicesAmount = filteredInvoices.reduce((sum, inv) => sum + inv.total, 0);
+            const paidInvoicesAmount = filteredInvoices
+                .filter(inv => inv.status === 'paid')
+                .reduce((sum, inv) => sum + inv.total, 0);
+            const pendingInvoicesAmount = filteredInvoices
+                .filter(inv => inv.status !== 'paid')
+                .reduce((sum, inv) => sum + inv.total, 0);
+            
+            // Calculate social security for the period
+            const socialSecurityMonthly = parseFloat(document.getElementById('socialSecurity').value) || 0;
+            let socialSecurityPeriod = 0;
+            
+            if (reportType === 'monthly') {
+                socialSecurityPeriod = socialSecurityMonthly;
+            } else if (reportType === 'quarterly') {
+                socialSecurityPeriod = socialSecurityMonthly * 3;
+            } else if (reportType === 'annual') {
+                socialSecurityPeriod = socialSecurityMonthly * 12;
+            }
+            
+            const totalDeductibleExpenses = totalExpenses + socialSecurityPeriod;
+            const taxableProfit = netIncome - totalDeductibleExpenses;
+            
+            const irpfRate = parseFloat(document.getElementById('irpfRate').value) / 100;
+            const irpfTax = Math.max(0, netIncome * irpfRate);
+            const afterTaxProfit = taxableProfit - irpfTax;
+            
+            // Generate platform breakdown
+            const platformBreakdown = {};
+            income.forEach(t => {
+                if (!platformBreakdown[t.platform]) {
+                    platformBreakdown[t.platform] = { gross: 0, commission: 0, net: 0, count: 0 };
+                }
+                platformBreakdown[t.platform].gross += t.grossAmount;
+                platformBreakdown[t.platform].commission += t.commission;
+                platformBreakdown[t.platform].net += t.netAmount;
+                platformBreakdown[t.platform].count += 1;
+            });
+            
+            // Generate expense breakdown
+            const expenseBreakdown = {};
+            expenses.forEach(t => {
+                if (!expenseBreakdown[t.category]) {
+                    expenseBreakdown[t.category] = { amount: 0, count: 0 };
+                }
+                expenseBreakdown[t.category].amount += t.amount;
+                expenseBreakdown[t.category].count += 1;
+            });
+            
+            // Generate HTML report
+            reportContent.innerHTML = `
+                <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                    <h3 style="text-align: center; color: #2c3e50; margin-bottom: 30px; font-size: 2em;">
+                        ${periodName} Financial Report
+                    </h3>
+                    
+                    <div class="summary-grid" style="margin-bottom: 30px;">
+                        <div class="summary-item">
+                            <h3>Gross Income</h3>
+                            <div class="amount">€${grossIncome.toFixed(2)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <h3>Platform Commissions</h3>
+                            <div class="amount negative">€${totalCommissions.toFixed(2)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <h3>Net Income</h3>
+                            <div class="amount positive">€${netIncome.toFixed(2)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <h3>Business Expenses</h3>
+                            <div class="amount negative">€${totalExpenses.toFixed(2)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <h3>Social Security</h3>
+                            <div class="amount negative">€${socialSecurityPeriod.toFixed(2)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <h3>Total Deductions</h3>
+                            <div class="amount negative">€${totalDeductibleExpenses.toFixed(2)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <h3>Taxable Profit</h3>
+                            <div class="amount ${taxableProfit >= 0 ? 'positive' : 'negative'}">€${taxableProfit.toFixed(2)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <h3>IRPF Tax Due</h3>
+                            <div class="amount negative">€${irpfTax.toFixed(2)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <h3>After Tax Profit</h3>
+                            <div class="amount ${afterTaxProfit >= 0 ? 'positive' : 'negative'}">€${afterTaxProfit.toFixed(2)}</div>
+                        </div>
+                    </div>
+                    
+                    ${filteredInvoices.length > 0 ? `
+                    <div style="margin-bottom: 30px;">
+                        <h4 style="color: #2c3e50; margin-bottom: 15px;">Invoice Summary</h4>
+                        <div style="background: #f8f9fa; border-radius: 10px; padding: 20px;">
+                            <div class="summary-grid">
+                                <div class="summary-item">
+                                    <h3>Total Invoices</h3>
+                                    <div class="amount">€${totalInvoicesAmount.toFixed(2)}</div>
+                                    <small>${filteredInvoices.length} invoice${filteredInvoices.length !== 1 ? 's' : ''}</small>
+                                </div>
+                                <div class="summary-item">
+                                    <h3>Paid Invoices</h3>
+                                    <div class="amount positive">€${paidInvoicesAmount.toFixed(2)}</div>
+                                    <small>${filteredInvoices.filter(inv => inv.status === 'paid').length} paid</small>
+                                </div>
+                                <div class="summary-item">
+                                    <h3>Pending Invoices</h3>
+                                    <div class="amount warning">€${pendingInvoicesAmount.toFixed(2)}</div>
+                                    <small>${filteredInvoices.filter(inv => inv.status !== 'paid').length} pending</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    ${Object.keys(platformBreakdown).length > 0 ? `
+                    <div style="margin-bottom: 30px;">
+                        <h4 style="color: #2c3e50; margin-bottom: 15px;">Platform Breakdown</h4>
+                        <div style="background: #f8f9fa; border-radius: 10px; padding: 20px;">
+                            ${Object.entries(platformBreakdown).map(([platform, data]) => `
+                                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e9ecef;">
+                                    <div>
+                                        <strong>${platform}</strong><br>
+                                        <small>${data.count} transaction${data.count !== 1 ? 's' : ''}</small>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div>Gross: €${data.gross.toFixed(2)}</div>
+                                        <div>Commission: €${data.commission.toFixed(2)}</div>
+                                        <div><strong>Net: €${data.net.toFixed(2)}</strong></div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    ${Object.keys(expenseBreakdown).length > 0 ? `
+                    <div style="margin-bottom: 30px;">
+                        <h4 style="color: #2c3e50; margin-bottom: 15px;">Expense Breakdown</h4>
+                        <div style="background: #f8f9fa; border-radius: 10px; padding: 20px;">
+                            ${Object.entries(expenseBreakdown).map(([category, data]) => `
+                                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e9ecef;">
+                                    <div>
+                                        <strong>${category}</strong><br>
+                                        <small>${data.count} expense${data.count !== 1 ? 's' : ''}</small>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <strong>€${data.amount.toFixed(2)}</strong>
+                                    </div>
+                                </div>
+                            `).join('')}
+                            ${socialSecurityPeriod > 0 ? `
+                                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e9ecef;">
+                                    <div>
+                                        <strong>Social Security</strong><br>
+                                        <small>100% deductible</small>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <strong>€${socialSecurityPeriod.toFixed(2)}</strong>
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e9ecef;">
+                        <button class="btn" onclick="printReport()" style="width: auto; padding: 12px 30px; margin-right: 10px;">
+                            🖨️ Print Report
+                        </button>
+                        <button class="btn btn-success" onclick="exportReport()" style="width: auto; padding: 12px 30px;">
+                            📊 Export as CSV
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function printReport() {
+            const reportContent = document.getElementById('reportContent');
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Financial Report</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 20px; }
+                            .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+                            .summary-item { border: 1px solid #ddd; padding: 15px; text-align: center; }
+                            .amount { font-size: 1.5em; font-weight: bold; }
+                            .positive { color: green; }
+                            .negative { color: red; }
+                            .warning { color: orange; }
+                        </style>
+                    </head>
+                    <body>
+                        ${reportContent.innerHTML}
+                    </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+        
+        function exportReport() {
+            const reportType = document.getElementById('reportType').value;
+            const period = document.getElementById('reportPeriod').value;
+            
+            let csvContent = "Date,Type,Platform/Category,Description,Gross Amount,Commission,Net Amount,Status\n";
+            
+            let filteredTransactions = [];
+            let filteredInvoices = [];
+            
+            if (reportType === 'monthly') {
+                const [year, month] = period.split('-');
+                filteredTransactions = transactions.filter(t => {
+                    const transactionDate = new Date(t.date);
+                    return transactionDate.getFullYear() == year && (transactionDate.getMonth() + 1) == parseInt(month);
+                });
+                filteredInvoices = invoices.filter(inv => {
+                    const invoiceDate = new Date(inv.date);
+                    return invoiceDate.getFullYear() == year && (invoiceDate.getMonth() + 1) == parseInt(month);
+                });
+            } else if (reportType === 'quarterly') {
+                const [year, quarter] = period.split('-');
+                const qNum = parseInt(quarter.substring(1));
+                const startMonth = (qNum - 1) * 3 + 1;
+                const endMonth = qNum * 3;
+                
+                filteredTransactions = transactions.filter(t => {
+                    const transactionDate = new Date(t.date);
+                    const month = transactionDate.getMonth() + 1;
+                    return transactionDate.getFullYear() == year && month >= startMonth && month <= endMonth;
+                });
+                filteredInvoices = invoices.filter(inv => {
+                    const invoiceDate = new Date(inv.date);
+                    const month = invoiceDate.getMonth() + 1;
+                    return invoiceDate.getFullYear() == year && month >= startMonth && month <= endMonth;
+                });
+            } else if (reportType === 'annual') {
+                const year = parseInt(period);
+                filteredTransactions = transactions.filter(t => {
+                    const transactionDate = new Date(t.date);
+                    return transactionDate.getFullYear() == year;
+                });
+                filteredInvoices = invoices.filter(inv => {
+                    const invoiceDate = new Date(inv.date);
+                    return invoiceDate.getFullYear() == year;
+                });
+            }
+            
+            // Add transactions to CSV
+            filteredTransactions.forEach(t => {
+                if (t.type === 'income') {
+                    csvContent += `${t.date},Income,${t.platform},"${t.student || 'Teaching'}",${t.grossAmount.toFixed(2)},${t.commission.toFixed(2)},${t.netAmount.toFixed(2)},Received\n`;
+                } else {
+                    csvContent += `${t.date},Expense,${t.category},"${t.description}",0,0,-${t.amount.toFixed(2)},Paid\n`;
+                }
+            });
+            
+            // Add invoices to CSV
+            filteredInvoices.forEach(inv => {
+                const status = getInvoiceStatus(inv);
+                csvContent += `${inv.date},Invoice,${inv.student.name},"${inv.number}",${inv.total.toFixed(2)},0,${inv.total.toFixed(2)},${status.charAt(0).toUpperCase() + status.slice(1)}\n`;
+            });
+            
+            // Add social security if applicable
+            const socialSecurityMonthly = parseFloat(document.getElementById('socialSecurity').value) || 0;
+            if (socialSecurityMonthly > 0) {
+                let socialSecurityPeriod = 0;
+                if (reportType === 'monthly') {
+                    socialSecurityPeriod = socialSecurityMonthly;
+                } else if (reportType === 'quarterly') {
+                    socialSecurityPeriod = socialSecurityMonthly * 3;
+                } else if (reportType === 'annual') {
+                    socialSecurityPeriod = socialSecurityMonthly * 12;
+                }
+                csvContent += `${period},Expense,Social Security,"Monthly social security contribution",0,0,-${socialSecurityPeriod.toFixed(2)},Paid\n`;
+            }
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `financial_report_${period}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Set default dates to today
+        function setDefaultDates() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('incomeDate').value = today;
+            document.getElementById('expenseDate').value = today;
+        }
+        
+        // Initialize app
+        loadData();
+        updateDisplay();
+        updateStudentDropdown();
+        updateReportOptions();
+        updateInvoiceStudentDropdown();
+        updateInvoiceFilters();
+        setDefaultDates();
+    </script>
+</body>
+</html>
