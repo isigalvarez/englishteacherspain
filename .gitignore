@@ -13,3 +13,7 @@ node_modules/
 dist/
 build/
 .cache/
+
+# Use defined
+.data
+.env
