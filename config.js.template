@@ -1,0 +1,7 @@
+window.BUSINESS_DEFAULTS = {
+    name: "Jane Smith",
+    nif: "12345678A",
+    address: "Calle Mayor 1, 28013 Madrid",
+    email: "jane@email.com",
+    phone: "+34 600 000 000"
+};

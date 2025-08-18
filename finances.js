@@ -1383,3 +1383,15 @@ updateReportOptions();
 updateInvoiceStudentDropdown();
 updateInvoiceFilters();
 setDefaultDates();
+
+function setInvoiceBusinessDefaults() {
+    if (window.BUSINESS_DEFAULTS) {
+        document.getElementById('businessName').value = window.BUSINESS_DEFAULTS.name || "";
+        document.getElementById('businessNIF').value = window.BUSINESS_DEFAULTS.nif || "";
+        document.getElementById('businessAddress').value = window.BUSINESS_DEFAULTS.address || "";
+        document.getElementById('businessEmail').value = window.BUSINESS_DEFAULTS.email || "";
+        document.getElementById('businessPhone').value = window.BUSINESS_DEFAULTS.phone || "";
+    }
+}
+// Call this after DOM is ready or when showing the invoice form
+setInvoiceBusinessDefaults();
