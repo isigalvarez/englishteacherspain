@@ -402,7 +402,7 @@ function updateDisplay() {
     const grossIncome = income.reduce((sum, t) => sum + t.grossAmount, 0);
     const totalCommissions = income.reduce((sum, t) => sum + t.commission, 0);
     const netIncome = income.reduce((sum, t) => sum + t.netAmount, 0);
-    const totalExpenses = expenses.reduce((sum, t) => sum + t.amount, 0);
+    const businessExpenses = expenses.reduce((sum, t) => sum + t.amount, 0);
 
     // Calculate pending invoices total for current month
     const pendingInvoicesTotal = monthInvoices
@@ -411,9 +411,8 @@ function updateDisplay() {
 
     // Social security for current month only
     const socialSecurityMonthly = parseFloat(document.getElementById('socialSecurity').value) || 0;
-    const totalSocialSecurity = socialSecurityMonthly; // Only one month
 
-    const totalDeductibleExpenses = totalExpenses + totalSocialSecurity;
+    const totalDeductibleExpenses = businessExpenses + socialSecurityMonthly;
     const taxableProfit = netIncome - totalDeductibleExpenses;
 
     // Calculate IRPF tax
@@ -421,11 +420,16 @@ function updateDisplay() {
     const irpfTax = Math.max(0, netIncome * irpfRate); // Applied to net income
     const afterTaxProfit = taxableProfit - irpfTax;
 
+    // Calculate business expenses and social security separately
+    const totalExpenses = businessExpenses + socialSecurityMonthly;
+
     // Update summary
     document.getElementById('grossIncome').textContent = `€${grossIncome.toFixed(2)}`;
     document.getElementById('totalCommissions').textContent = `€${totalCommissions.toFixed(2)}`;
     document.getElementById('netIncome').textContent = `€${netIncome.toFixed(2)}`;
-    document.getElementById('totalExpenses').textContent = `€${totalDeductibleExpenses.toFixed(2)}`;
+    document.getElementById('businessExpenses').textContent = `€${businessExpenses.toFixed(2)}`;
+    document.getElementById('socialSecuritySummary').textContent = `€${socialSecurityMonthly.toFixed(2)}`;
+    document.getElementById('totalExpenses').textContent = `€${totalExpenses.toFixed(2)}`;
     document.getElementById('pendingInvoices').textContent = `€${pendingInvoicesTotal.toFixed(2)}`;
     document.getElementById('irpfTax').textContent = `€${irpfTax.toFixed(2)}`;
 
