@@ -601,18 +601,22 @@
                 <!-- Summary Section -->
                 <div class="summary">
                     <h2>📊 Monthly Financial Summary</h2>
-                    <div class="summary-grid">
+                    <div class="summary-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+                        <!-- Row 1 -->
                         <div class="summary-item">
                             <h3>Gross Income</h3>
                             <div class="amount" id="grossIncome">€0.00</div>
                         </div>
                         <div class="summary-item">
+                            <h3>Pending Invoices</h3>
+                            <div class="amount warning" id="pendingInvoices">€0.00</div>
+                        </div>
+                        <div></div>
+                        <div></div>
+                        <!-- Row 2 -->
+                        <div class="summary-item">
                             <h3>Platform Commissions</h3>
                             <div class="amount negative" id="totalCommissions">€0.00</div>
-                        </div>
-                        <div class="summary-item">
-                            <h3>Net Income</h3>
-                            <div class="amount positive" id="netIncome">€0.00</div>
                         </div>
                         <div class="summary-item">
                             <h3>Business Expenses</h3>
@@ -626,20 +630,18 @@
                             <h3>Total Expenses</h3>
                             <div class="amount negative" id="totalExpenses">€0.00</div>
                         </div>
+                        <!-- Row 3 -->
                         <div class="summary-item">
-                            <h3>Pending Invoices</h3>
-                            <div class="amount warning" id="pendingInvoices">€0.00</div>
-                        </div>
-                        <div class="summary-item">
-                            <h3>Taxable Profit</h3>
-                            <div class="amount" id="taxableProfit">€0.00</div>
+                            <h3>Net Income</h3>
+                            <div class="amount positive" id="netIncome">€0.00</div>
                         </div>
                         <div class="summary-item">
                             <h3>IRPF Tax Due</h3>
                             <div class="amount negative" id="irpfTax">€0.00</div>
                         </div>
+                        <div></div>
                         <div class="summary-item">
-                            <h3>After Tax Profit</h3>
+                            <h3>Profit/Loss</h3>
                             <div class="amount" id="afterTaxProfit">€0.00</div>
                         </div>
                     </div>

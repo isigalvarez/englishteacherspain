@@ -401,8 +401,8 @@ function updateDisplay() {
 
     const grossIncome = income.reduce((sum, t) => sum + t.grossAmount, 0);
     const totalCommissions = income.reduce((sum, t) => sum + t.commission, 0);
-    const netIncome = income.reduce((sum, t) => sum + t.netAmount, 0);
     const businessExpenses = expenses.reduce((sum, t) => sum + t.amount, 0);
+
 
     // Calculate pending invoices total for current month
     const pendingInvoicesTotal = monthInvoices
@@ -412,34 +412,31 @@ function updateDisplay() {
     // Social security for current month only
     const socialSecurityMonthly = parseFloat(document.getElementById('socialSecurity').value) || 0;
 
-    const totalDeductibleExpenses = businessExpenses + socialSecurityMonthly;
-    const taxableProfit = netIncome - totalDeductibleExpenses;
+
+
+    // Calculate business expenses and social security separately
+    const totalExpenses = businessExpenses + socialSecurityMonthly + totalCommissions;
+    const netIncome = grossIncome - totalExpenses;
 
     // Calculate IRPF tax
     const irpfRate = parseFloat(document.getElementById('irpfRate').value) / 100;
-    const irpfTax = Math.max(0, netIncome * irpfRate); // Applied to net income
-    const afterTaxProfit = taxableProfit - irpfTax;
-
-    // Calculate business expenses and social security separately
-    const totalExpenses = businessExpenses + socialSecurityMonthly;
+    const irpfBase = netIncome;
+    const irpfTax = Math.max(0, irpfBase * irpfRate);
+    const netProfit = irpfBase - irpfTax;
 
     // Update summary
     document.getElementById('grossIncome').textContent = `€${grossIncome.toFixed(2)}`;
+    document.getElementById('pendingInvoices').textContent = `€${pendingInvoicesTotal.toFixed(2)}`;
     document.getElementById('totalCommissions').textContent = `€${totalCommissions.toFixed(2)}`;
-    document.getElementById('netIncome').textContent = `€${netIncome.toFixed(2)}`;
     document.getElementById('businessExpenses').textContent = `€${businessExpenses.toFixed(2)}`;
     document.getElementById('socialSecuritySummary').textContent = `€${socialSecurityMonthly.toFixed(2)}`;
     document.getElementById('totalExpenses').textContent = `€${totalExpenses.toFixed(2)}`;
-    document.getElementById('pendingInvoices').textContent = `€${pendingInvoicesTotal.toFixed(2)}`;
+    document.getElementById('netIncome').textContent = `€${netIncome.toFixed(2)}`;
     document.getElementById('irpfTax').textContent = `€${irpfTax.toFixed(2)}`;
 
-    const profitElement = document.getElementById('taxableProfit');
-    profitElement.textContent = `€${taxableProfit.toFixed(2)}`;
-    profitElement.className = taxableProfit >= 0 ? 'amount positive' : 'amount negative';
-
-    const afterTaxElement = document.getElementById('afterTaxProfit');
-    afterTaxElement.textContent = `€${afterTaxProfit.toFixed(2)}`;
-    afterTaxElement.className = afterTaxProfit >= 0 ? 'amount positive' : 'amount negative';
+    const netProfitElement = document.getElementById('afterTaxProfit');
+    netProfitElement.textContent = `€${netProfit.toFixed(2)}`;
+    netProfitElement.className = netProfit >= 0 ? 'amount positive' : 'amount negative';
 
     // Update transaction list (show only current month)
     const transactionList = document.getElementById('transactionList');
@@ -1443,3 +1440,5 @@ function setInvoiceBusinessDefaults() {
 }
 // Call this after DOM is ready or when showing the invoice form
 setInvoiceBusinessDefaults();
+
+console.log('Business Expenses this month:', businessExpenses);
