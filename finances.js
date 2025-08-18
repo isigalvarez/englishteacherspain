@@ -488,6 +488,10 @@ function addService() {
                 <label>IVA (%)</label>
                 <input type="number" class="service-iva" step="0.1" placeholder="0" onchange="calculateInvoiceTotal()">
             </div>
+            <div class="form-group">
+                <label>IRPF (%)</label>
+                <input type="number" class="service-irpf" step="0.1" placeholder="0" onchange="calculateInvoiceTotal()">
+            </div>
             <button type="button" class="btn btn-expense" style="width: auto; padding: 8px 12px;" onclick="removeService(this)">Remove</button>
         </div>
     `;
@@ -506,23 +510,41 @@ function calculateInvoiceTotal() {
     const serviceRows = document.querySelectorAll('.service-row');
     let subtotal = 0;
     let totalIVA = 0;
-    
+    let totalIRPF = 0;
+
     serviceRows.forEach(row => {
         const hours = parseFloat(row.querySelector('.service-hours').value) || 0;
         const rate = parseFloat(row.querySelector('.service-rate').value) || 0;
         const ivaPercent = parseFloat(row.querySelector('.service-iva').value) || 0;
-        
+        const irpfPercent = parseFloat(row.querySelector('.service-irpf')?.value) || 0;
+
         const lineTotal = hours * rate;
         const lineIVA = lineTotal * (ivaPercent / 100);
-        
+        const lineIRPF = lineTotal * (irpfPercent / 100);
+
         subtotal += lineTotal;
         totalIVA += lineIVA;
+        totalIRPF += lineIRPF;
     });
-    
-    const total = subtotal + totalIVA;
-    
+
+    const total = subtotal + totalIVA - totalIRPF;
+
     document.getElementById('invoiceSubtotal').textContent = subtotal.toFixed(2);
     document.getElementById('invoiceIVA').textContent = totalIVA.toFixed(2);
+    // Add this line for IRPF display:
+    let irpfElem = document.getElementById('invoiceIRPF');
+    if (!irpfElem) {
+        // Create IRPF display if not present
+        const totalBox = document.getElementById('invoiceTotal').parentElement.parentElement;
+        const irpfRow = document.createElement('div');
+        irpfRow.style.fontSize = "1.1em";
+        irpfRow.style.marginBottom = "5px";
+        irpfRow.innerHTML = `IRPF: -€<span id="invoiceIRPF">0.00</span>`;
+        totalBox.insertBefore(irpfRow, totalBox.children[1]);
+        irpfElem = document.getElementById('invoiceIRPF');
+    }
+    irpfElem.textContent = totalIRPF.toFixed(2);
+
     document.getElementById('invoiceTotal').textContent = total.toFixed(2);
 }
 
@@ -552,27 +574,33 @@ document.getElementById('invoiceForm').addEventListener('submit', function(e) {
     const services = [];
     let subtotal = 0;
     let totalIVA = 0;
+    let totalIRPF = 0;
     
     serviceRows.forEach(row => {
         const description = row.querySelector('.service-description').value;
         const hours = parseFloat(row.querySelector('.service-hours').value) || 0;
         const rate = parseFloat(row.querySelector('.service-rate').value) || 0;
         const ivaPercent = parseFloat(row.querySelector('.service-iva').value) || 0;
+        const irpfPercent = parseFloat(row.querySelector('.service-irpf').value) || 0;
         
         const lineTotal = hours * rate;
         const lineIVA = lineTotal * (ivaPercent / 100);
+        const lineIRPF = lineTotal * (irpfPercent / 100);
         
         services.push({
             description,
             hours,
             rate,
             ivaPercent,
+            irpfPercent,
             lineTotal,
-            lineIVA
+            lineIVA,
+            lineIRPF
         });
         
         subtotal += lineTotal;
         totalIVA += lineIVA;
+        totalIRPF += lineIRPF;
     });
     
     const invoice = {
@@ -597,7 +625,8 @@ document.getElementById('invoiceForm').addEventListener('submit', function(e) {
         services: services,
         subtotal: subtotal,
         totalIVA: totalIVA,
-        total: subtotal + totalIVA,
+        totalIRPF: totalIRPF,
+        total: subtotal + totalIVA - totalIRPF,
         notes: document.getElementById('invoiceNotes').value,
         status: 'pending',
         paidDate: null
@@ -704,7 +733,7 @@ function showInvoicePreview(invoice) {
 function generateInvoiceHTML(invoice) {
     const invoiceDate = new Date(invoice.date).toLocaleDateString('en-GB');
     const dueDate = new Date(invoice.dueDate).toLocaleDateString('en-GB');
-    
+
     return `
         <div class="invoice-header">
             <div class="invoice-title">INVOICE</div>
@@ -741,8 +770,10 @@ function generateInvoiceHTML(invoice) {
                     <th class="text-right">Hours</th>
                     <th class="text-right">Rate (€/hr)</th>
                     <th class="text-right">IVA %</th>
+                    <th class="text-right">IRPF %</th>
                     <th class="text-right">Subtotal</th>
                     <th class="text-right">IVA</th>
+                    <th class="text-right">IRPF</th>
                     <th class="text-right">Total</th>
                 </tr>
             </thead>
@@ -752,24 +783,30 @@ function generateInvoiceHTML(invoice) {
                         <td>${service.description}</td>
                         <td class="text-right">${service.hours}</td>
                         <td class="text-right">€${service.rate.toFixed(2)}</td>
-                        <td class="text-right">${service.ivaPercent}%</td>
+                        <td class="text-right">${service.ivaPercent || 0}%</td>
+                        <td class="text-right">${service.irpfPercent || 0}%</td>
                         <td class="text-right">€${service.lineTotal.toFixed(2)}</td>
-                        <td class="text-right">€${service.lineIVA.toFixed(2)}</td>
-                        <td class="text-right">€${(service.lineTotal + service.lineIVA).toFixed(2)}</td>
+                        <td class="text-right">€${service.lineIVA?.toFixed(2) || '0.00'}</td>
+                        <td class="text-right">-€${service.lineIRPF?.toFixed(2) || '0.00'}</td>
+                        <td class="text-right">€${(service.lineTotal + (service.lineIVA || 0) - (service.lineIRPF || 0)).toFixed(2)}</td>
                     </tr>
                 `).join('')}
             </tbody>
             <tfoot>
                 <tr class="total-row">
-                    <td colspan="6"><strong>Subtotal:</strong></td>
+                    <td colspan="8"><strong>Subtotal:</strong></td>
                     <td class="text-right"><strong>€${invoice.subtotal.toFixed(2)}</strong></td>
                 </tr>
                 <tr class="total-row">
-                    <td colspan="6"><strong>Total IVA:</strong></td>
+                    <td colspan="8"><strong>Total IVA:</strong></td>
                     <td class="text-right"><strong>€${invoice.totalIVA.toFixed(2)}</strong></td>
                 </tr>
+                <tr class="total-row">
+                    <td colspan="8"><strong>Total IRPF:</strong></td>
+                    <td class="text-right"><strong>-€${invoice.totalIRPF?.toFixed(2) || '0.00'}</strong></td>
+                </tr>
                 <tr class="total-row" style="font-size: 1.2em;">
-                    <td colspan="6"><strong>TOTAL:</strong></td>
+                    <td colspan="8"><strong>TOTAL:</strong></td>
                     <td class="text-right"><strong>€${invoice.total.toFixed(2)}</strong></td>
                 </tr>
             </tfoot>
