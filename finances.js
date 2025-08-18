@@ -141,9 +141,10 @@ const studentForm = document.getElementById('studentForm');
 studentForm.addEventListener('submit', function(e) {
     e.preventDefault();
     const student = {
+        id: Date.now(),
         name: document.getElementById('studentFormName').value,
         phone: document.getElementById('studentPhone').value,
-        nif: document.getElementById('studentNIF').value, // <-- Add this line
+        nif: document.getElementById('studentNIF').value, 
         email: document.getElementById('studentEmail').value,
         address: document.getElementById('studentAddress').value,
         rate: document.getElementById('studentRate').value,
@@ -608,7 +609,7 @@ document.getElementById('invoiceForm').addEventListener('submit', function(e) {
     updateDisplay(); // Update financial summary
     
     // Show the generated invoice
-    showInvoicePreview(invoice);
+    downloadInvoiceHTML(invoice);
 });
 
 function showInvoicePreview(invoice) {
@@ -1297,6 +1298,44 @@ function backupData() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+}
+
+
+function downloadInvoiceHTML(invoice) {
+    const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Invoice ${invoice.number}</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; color: #333; line-height: 1.6; }
+                .invoice-header { display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px; }
+                .invoice-title { font-size: 2em; font-weight: bold; color: #2c3e50; }
+                .invoice-info { text-align: right; }
+                .business-info, .client-info { margin-bottom: 30px; }
+                .business-info h3, .client-info h3 { margin-bottom: 10px; color: #2c3e50; border-bottom: 1px solid #dee2e6; padding-bottom: 5px; }
+                table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                th, td { padding: 12px; text-align: left; border-bottom: 1px solid #dee2e6; }
+                th { background: #f8f9fa; font-weight: bold; }
+                .total-row { font-weight: bold; background: #f8f9fa; }
+                .text-right { text-align: right; }
+                .invoice-notes { margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 5px; }
+            </style>
+        </head>
+        <body>
+            ${generateInvoiceHTML(invoice)}
+        </body>
+        </html>
+    `;
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `Invoice_${invoice.number}.html`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
 }
 
 // Initialize app
