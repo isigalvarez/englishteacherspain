@@ -137,16 +137,16 @@ document.getElementById('studentSelect').addEventListener('change', function() {
 });
 
 // Add student
-document.getElementById('studentForm').addEventListener('submit', function(e) {
+const studentForm = document.getElementById('studentForm');
+studentForm.addEventListener('submit', function(e) {
     e.preventDefault();
-    
     const student = {
-        id: Date.now(),
         name: document.getElementById('studentFormName').value,
         phone: document.getElementById('studentPhone').value,
+        nif: document.getElementById('studentNIF').value, // <-- Add this line
         email: document.getElementById('studentEmail').value,
         address: document.getElementById('studentAddress').value,
-        rate: parseFloat(document.getElementById('studentRate').value) || 0,
+        rate: document.getElementById('studentRate').value,
         classType: document.getElementById('classType').value,
         notes: document.getElementById('studentNotes').value
     };
@@ -320,11 +320,12 @@ function updateStudentsList() {
                         </div>
                     </div>
                     <div class="student-details">
-                        <div><strong>Phone:</strong> ${student.phone || 'Not provided'}</div>
-                        <div><strong>Email:</strong> ${student.email || 'Not provided'}</div>
-                        <div><strong>Address:</strong> ${student.address || 'Not provided'}</div>
-                        <div><strong>Rate:</strong> €${student.rate.toFixed(2)}/hour</div>
-                        <div><strong>Class Type:</strong> ${student.classType}</div>
+                        <div><strong>Phone:</strong> ${student.phone || ''}</div>
+                        <div><strong>NIF/NIE:</strong> ${student.nif || ''}</div>
+                        <div><strong>Email:</strong> ${student.email || ''}</div>
+                        <div><strong>Address:</strong> ${student.address || ''}</div>
+                        <div><strong>Rate:</strong> €${student.rate || ''}/hr</div>
+                        <div><strong>Class Type:</strong> ${student.classType || ''}</div>
                     </div>
                     ${student.notes ? `<div class="student-notes"><strong>Notes:</strong> ${student.notes}</div>` : ''}
                 </div>
