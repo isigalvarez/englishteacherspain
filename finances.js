@@ -60,6 +60,26 @@ function markInvoiceAsPaid(invoiceId) {
     if (invoice) {
         invoice.status = 'paid';
         invoice.paidDate = new Date().toISOString().split('T')[0];
+
+        // Add income transaction if not already present
+        const existingIncome = transactions.find(
+            t => t.type === 'income' && t.invoiceId === invoice.id
+        );
+        if (!existingIncome) {
+            transactions.push({
+                id: Date.now(),
+                type: 'income',
+                date: invoice.date,
+                grossAmount: invoice.total,
+                commission: 0,
+                netAmount: invoice.total,
+                platform: 'Invoice',
+                student: invoice.student.name,
+                commissionRate: 0,
+                invoiceId: invoice.id // Link to invoice
+            });
+        }
+
         saveData();
         updateInvoiceHistory();
         updateDisplay(); // Update financial summary
@@ -71,6 +91,12 @@ function markInvoiceAsUnpaid(invoiceId) {
     if (invoice) {
         invoice.status = 'pending';
         invoice.paidDate = null;
+
+        // Remove related income transaction if exists
+        transactions = transactions.filter(
+            t => !(t.type === 'income' && t.invoiceId === invoice.id)
+        );
+
         saveData();
         updateInvoiceHistory();
         updateDisplay(); // Update financial summary
