@@ -350,33 +350,51 @@ function updateInvoiceFilters() {
 
 // Update display
 function updateDisplay() {
-    const income = transactions.filter(t => t.type === 'income');
-    const expenses = transactions.filter(t => t.type === 'expense');
-    
+    // Get current year and month
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth(); // 0-based
+
+    // Filter transactions for current month
+    const income = transactions.filter(t => 
+        t.type === 'income' &&
+        new Date(t.date).getFullYear() === currentYear &&
+        new Date(t.date).getMonth() === currentMonth
+    );
+    const expenses = transactions.filter(t => 
+        t.type === 'expense' &&
+        new Date(t.date).getFullYear() === currentYear &&
+        new Date(t.date).getMonth() === currentMonth
+    );
+
+    // Filter invoices for current month
+    const monthInvoices = invoices.filter(inv =>
+        new Date(inv.date).getFullYear() === currentYear &&
+        new Date(inv.date).getMonth() === currentMonth
+    );
+
     const grossIncome = income.reduce((sum, t) => sum + t.grossAmount, 0);
     const totalCommissions = income.reduce((sum, t) => sum + t.commission, 0);
     const netIncome = income.reduce((sum, t) => sum + t.netAmount, 0);
     const totalExpenses = expenses.reduce((sum, t) => sum + t.amount, 0);
-    
-    // Calculate pending invoices total
-    const pendingInvoicesTotal = invoices
+
+    // Calculate pending invoices total for current month
+    const pendingInvoicesTotal = monthInvoices
         .filter(inv => inv.status !== 'paid')
         .reduce((sum, inv) => sum + inv.total, 0);
-    
-    // Add social security as deductible expense
+
+    // Social security for current month only
     const socialSecurityMonthly = parseFloat(document.getElementById('socialSecurity').value) || 0;
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth() + 1; // Get current month (1-12)
-    const totalSocialSecurity = socialSecurityMonthly * currentMonth; // Total SS paid this year
-    
+    const totalSocialSecurity = socialSecurityMonthly; // Only one month
+
     const totalDeductibleExpenses = totalExpenses + totalSocialSecurity;
     const taxableProfit = netIncome - totalDeductibleExpenses;
-    
+
     // Calculate IRPF tax
     const irpfRate = parseFloat(document.getElementById('irpfRate').value) / 100;
     const irpfTax = Math.max(0, netIncome * irpfRate); // Applied to net income
     const afterTaxProfit = taxableProfit - irpfTax;
-    
+
     // Update summary
     document.getElementById('grossIncome').textContent = `€${grossIncome.toFixed(2)}`;
     document.getElementById('totalCommissions').textContent = `€${totalCommissions.toFixed(2)}`;
@@ -384,22 +402,22 @@ function updateDisplay() {
     document.getElementById('totalExpenses').textContent = `€${totalDeductibleExpenses.toFixed(2)}`;
     document.getElementById('pendingInvoices').textContent = `€${pendingInvoicesTotal.toFixed(2)}`;
     document.getElementById('irpfTax').textContent = `€${irpfTax.toFixed(2)}`;
-    
+
     const profitElement = document.getElementById('taxableProfit');
     profitElement.textContent = `€${taxableProfit.toFixed(2)}`;
     profitElement.className = taxableProfit >= 0 ? 'amount positive' : 'amount negative';
-    
+
     const afterTaxElement = document.getElementById('afterTaxProfit');
     afterTaxElement.textContent = `€${afterTaxProfit.toFixed(2)}`;
     afterTaxElement.className = afterTaxProfit >= 0 ? 'amount positive' : 'amount negative';
-    
-    // Update transaction list
+
+    // Update transaction list (show only current month)
     const transactionList = document.getElementById('transactionList');
-    if (transactions.length === 0) {
-        transactionList.innerHTML = '<p style="text-align: center; color: #7f8c8d; margin-top: 50px;">No transactions yet. Add some income or expenses to get started!</p>';
+    const monthTransactions = [...income, ...expenses].sort((a, b) => new Date(b.date) - new Date(a.date));
+    if (monthTransactions.length === 0) {
+        transactionList.innerHTML = '<p style="text-align: center; color: #7f8c8d; margin-top: 50px;">No transactions yet this month. Add some income or expenses to get started!</p>';
     } else {
-        const sortedTransactions = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
-        transactionList.innerHTML = sortedTransactions.map(t => {
+        transactionList.innerHTML = monthTransactions.map(t => {
             if (t.type === 'income') {
                 return `
                     <div class="transaction-item">
