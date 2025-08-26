@@ -374,7 +374,51 @@ function updateInvoiceFilters() {
     });
 }
 
-// Update display
+// Calculate summary values for a given set of transactions and invoices.
+function calculateSummary(transactionsArr, invoicesArr, socialSecurity, irpfRate) {
+    const income = transactionsArr.filter(t => t.type === 'income');
+    const expenses = transactionsArr.filter(t => t.type === 'expense');
+
+    const grossIncome = income.reduce((sum, t) => sum + t.grossAmount, 0);
+    const totalCommissions = income.reduce((sum, t) => sum + t.commission, 0);
+    const businessExpenses = expenses.reduce((sum, t) => sum + t.amount, 0);
+
+    // Pending invoices total
+    const pendingInvoicesTotal = invoicesArr
+        .filter(inv => inv.status !== 'paid')
+        .reduce((sum, inv) => sum + inv.total, 0);
+
+    // Calculate business expenses and social security separately
+    const totalExpenses = businessExpenses + socialSecurity + totalCommissions;
+    const netIncome = grossIncome - totalExpenses;
+
+    // Calculate IRPF tax
+    const irpfBase = netIncome;
+    const irpfTax = Math.max(0, irpfBase * irpfRate);
+    const netProfit = irpfBase - irpfTax;
+
+    // For report compatibility
+    const totalDeductibleExpenses = totalExpenses;
+    const taxableProfit = netIncome;
+    const afterTaxProfit = netProfit;
+
+    return {
+        grossIncome,
+        totalCommissions,
+        businessExpenses,
+        socialSecurity,
+        totalExpenses,
+        netIncome,
+        irpfTax,
+        netProfit,
+        pendingInvoicesTotal,
+        totalDeductibleExpenses,
+        taxableProfit,
+        afterTaxProfit
+    };
+}
+
+// Update display using calculateSummary
 function updateDisplay() {
     // Get current year and month
     const now = new Date();
@@ -382,16 +426,17 @@ function updateDisplay() {
     const currentMonth = now.getMonth(); // 0-based
 
     // Filter transactions for current month
-    const income = transactions.filter(t => 
+    const income = transactions.filter(t =>
         t.type === 'income' &&
         new Date(t.date).getFullYear() === currentYear &&
         new Date(t.date).getMonth() === currentMonth
     );
-    const expenses = transactions.filter(t => 
+    const expenses = transactions.filter(t =>
         t.type === 'expense' &&
         new Date(t.date).getFullYear() === currentYear &&
         new Date(t.date).getMonth() === currentMonth
     );
+    const monthTransactions = [...income, ...expenses];
 
     // Filter invoices for current month
     const monthInvoices = invoices.filter(inv =>
@@ -399,52 +444,32 @@ function updateDisplay() {
         new Date(inv.date).getMonth() === currentMonth
     );
 
-    const grossIncome = income.reduce((sum, t) => sum + t.grossAmount, 0);
-    const totalCommissions = income.reduce((sum, t) => sum + t.commission, 0);
-    const businessExpenses = expenses.reduce((sum, t) => sum + t.amount, 0);
-
-
-    // Calculate pending invoices total for current month
-    const pendingInvoicesTotal = monthInvoices
-        .filter(inv => inv.status !== 'paid')
-        .reduce((sum, inv) => sum + inv.total, 0);
-
-    // Social security for current month only
     const socialSecurityMonthly = parseFloat(document.getElementById('socialSecurity').value) || 0;
-
-
-
-    // Calculate business expenses and social security separately
-    const totalExpenses = businessExpenses + socialSecurityMonthly + totalCommissions;
-    const netIncome = grossIncome - totalExpenses;
-
-    // Calculate IRPF tax
     const irpfRate = parseFloat(document.getElementById('irpfRate').value) / 100;
-    const irpfBase = netIncome;
-    const irpfTax = Math.max(0, irpfBase * irpfRate);
-    const netProfit = irpfBase - irpfTax;
+
+    const summary = calculateSummary(monthTransactions, monthInvoices, socialSecurityMonthly, irpfRate);
 
     // Update summary
-    document.getElementById('grossIncome').textContent = `€${grossIncome.toFixed(2)}`;
-    document.getElementById('pendingInvoices').textContent = `€${pendingInvoicesTotal.toFixed(2)}`;
-    document.getElementById('totalCommissions').textContent = `€${totalCommissions.toFixed(2)}`;
-    document.getElementById('businessExpenses').textContent = `€${businessExpenses.toFixed(2)}`;
-    document.getElementById('socialSecuritySummary').textContent = `€${socialSecurityMonthly.toFixed(2)}`;
-    document.getElementById('totalExpenses').textContent = `€${totalExpenses.toFixed(2)}`;
-    document.getElementById('netIncome').textContent = `€${netIncome.toFixed(2)}`;
-    document.getElementById('irpfTax').textContent = `€${irpfTax.toFixed(2)}`;
+    document.getElementById('grossIncome').textContent = `€${summary.grossIncome.toFixed(2)}`;
+    document.getElementById('pendingInvoices').textContent = `€${summary.pendingInvoicesTotal.toFixed(2)}`;
+    document.getElementById('totalCommissions').textContent = `€${summary.totalCommissions.toFixed(2)}`;
+    document.getElementById('businessExpenses').textContent = `€${summary.businessExpenses.toFixed(2)}`;
+    document.getElementById('socialSecuritySummary').textContent = `€${summary.socialSecurity.toFixed(2)}`;
+    document.getElementById('totalExpenses').textContent = `€${summary.totalExpenses.toFixed(2)}`;
+    document.getElementById('netIncome').textContent = `€${summary.netIncome.toFixed(2)}`;
+    document.getElementById('irpfTax').textContent = `€${summary.irpfTax.toFixed(2)}`;
 
     const netProfitElement = document.getElementById('afterTaxProfit');
-    netProfitElement.textContent = `€${netProfit.toFixed(2)}`;
-    netProfitElement.className = netProfit >= 0 ? 'amount positive' : 'amount negative';
+    netProfitElement.textContent = `€${summary.netProfit.toFixed(2)}`;
+    netProfitElement.className = summary.netProfit >= 0 ? 'amount positive' : 'amount negative';
 
     // Update transaction list (show only current month)
     const transactionList = document.getElementById('transactionList');
-    const monthTransactions = [...income, ...expenses].sort((a, b) => new Date(b.date) - new Date(a.date));
-    if (monthTransactions.length === 0) {
+    const monthTransactionsSorted = monthTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+    if (monthTransactionsSorted.length === 0) {
         transactionList.innerHTML = '<p style="text-align: center; color: #7f8c8d; margin-top: 50px;">No transactions yet this month. Add some income or expenses to get started!</p>';
     } else {
-        transactionList.innerHTML = monthTransactions.map(t => {
+        transactionList.innerHTML = monthTransactionsSorted.map(t => {
             if (t.type === 'income') {
                 return `
                     <div class="transaction-item">
@@ -1001,11 +1026,11 @@ function generateReport() {
     const reportType = document.getElementById('reportType').value;
     const period = document.getElementById('reportPeriod').value;
     const reportContent = document.getElementById('reportContent');
-    
+
     let filteredTransactions = [];
     let filteredInvoices = [];
     let periodName = '';
-    
+
     if (reportType === 'monthly') {
         const [year, month] = period.split('-');
         filteredTransactions = transactions.filter(t => {
@@ -1048,29 +1073,10 @@ function generateReport() {
         });
         periodName = `${year}`;
     }
-    
-    // Calculate report data
-    const income = filteredTransactions.filter(t => t.type === 'income');
-    const expenses = filteredTransactions.filter(t => t.type === 'expense');
-    
-    const grossIncome = income.reduce((sum, t) => sum + t.grossAmount, 0);
-    const totalCommissions = income.reduce((sum, t) => sum + t.commission, 0);
-    const netIncome = income.reduce((sum, t) => sum + t.netAmount, 0);
-    const totalExpenses = expenses.reduce((sum, t) => sum + t.amount, 0);
-    
-    // Calculate invoice data
-    const totalInvoicesAmount = filteredInvoices.reduce((sum, inv) => sum + inv.total, 0);
-    const paidInvoicesAmount = filteredInvoices
-        .filter(inv => inv.status === 'paid')
-        .reduce((sum, inv) => sum + inv.total, 0);
-    const pendingInvoicesAmount = filteredInvoices
-        .filter(inv => inv.status !== 'paid')
-        .reduce((sum, inv) => sum + inv.total, 0);
-    
+
     // Calculate social security for the period
     const socialSecurityMonthly = parseFloat(document.getElementById('socialSecurity').value) || 0;
     let socialSecurityPeriod = 0;
-    
     if (reportType === 'monthly') {
         socialSecurityPeriod = socialSecurityMonthly;
     } else if (reportType === 'quarterly') {
@@ -1078,15 +1084,14 @@ function generateReport() {
     } else if (reportType === 'annual') {
         socialSecurityPeriod = socialSecurityMonthly * 12;
     }
-    
-    const totalDeductibleExpenses = totalExpenses + socialSecurityPeriod;
-    const taxableProfit = netIncome - totalDeductibleExpenses;
-    
     const irpfRate = parseFloat(document.getElementById('irpfRate').value) / 100;
-    const irpfTax = Math.max(0, netIncome * irpfRate);
-    const afterTaxProfit = taxableProfit - irpfTax;
-    
+
+    // Use the shared summary calculation
+    const summary = calculateSummary(filteredTransactions, filteredInvoices, socialSecurityPeriod, irpfRate);
+
     // Generate platform breakdown
+    const income = filteredTransactions.filter(t => t.type === 'income');
+    const expenses = filteredTransactions.filter(t => t.type === 'expense');
     const platformBreakdown = {};
     income.forEach(t => {
         if (!platformBreakdown[t.platform]) {
@@ -1097,8 +1102,6 @@ function generateReport() {
         platformBreakdown[t.platform].net += t.netAmount;
         platformBreakdown[t.platform].count += 1;
     });
-    
-    // Generate expense breakdown
     const expenseBreakdown = {};
     expenses.forEach(t => {
         if (!expenseBreakdown[t.category]) {
@@ -1107,50 +1110,58 @@ function generateReport() {
         expenseBreakdown[t.category].amount += t.amount;
         expenseBreakdown[t.category].count += 1;
     });
-    
-    // Generate HTML report
+
+    // Calculate invoice data
+    const totalInvoicesAmount = filteredInvoices.reduce((sum, inv) => sum + inv.total, 0);
+    const paidInvoicesAmount = filteredInvoices
+        .filter(inv => inv.status === 'paid')
+        .reduce((sum, inv) => sum + inv.total, 0);
+    const pendingInvoicesAmount = filteredInvoices
+        .filter(inv => inv.status !== 'paid')
+        .reduce((sum, inv) => sum + inv.total, 0);
+
+    // Generate HTML report (use summary object)
     reportContent.innerHTML = `
         <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
             <h3 style="text-align: center; color: #2c3e50; margin-bottom: 30px; font-size: 2em;">
                 ${periodName} Financial Report
             </h3>
-            
             <div class="summary-grid" style="margin-bottom: 30px;">
                 <div class="summary-item">
                     <h3>Gross Income</h3>
-                    <div class="amount">€${grossIncome.toFixed(2)}</div>
+                    <div class="amount">€${summary.grossIncome.toFixed(2)}</div>
                 </div>
                 <div class="summary-item">
                     <h3>Platform Commissions</h3>
-                    <div class="amount negative">€${totalCommissions.toFixed(2)}</div>
+                    <div class="amount negative">€${summary.totalCommissions.toFixed(2)}</div>
                 </div>
                 <div class="summary-item">
                     <h3>Net Income</h3>
-                    <div class="amount positive">€${netIncome.toFixed(2)}</div>
+                    <div class="amount positive">€${summary.netIncome.toFixed(2)}</div>
                 </div>
                 <div class="summary-item">
                     <h3>Business Expenses</h3>
-                    <div class="amount negative">€${totalExpenses.toFixed(2)}</div>
+                    <div class="amount negative">€${summary.businessExpenses.toFixed(2)}</div>
                 </div>
                 <div class="summary-item">
                     <h3>Social Security</h3>
-                    <div class="amount negative">€${socialSecurityPeriod.toFixed(2)}</div>
+                    <div class="amount negative">€${summary.socialSecurity.toFixed(2)}</div>
                 </div>
                 <div class="summary-item">
                     <h3>Total Deductions</h3>
-                    <div class="amount negative">€${totalDeductibleExpenses.toFixed(2)}</div>
+                    <div class="amount negative">€${summary.totalDeductibleExpenses.toFixed(2)}</div>
                 </div>
                 <div class="summary-item">
                     <h3>Taxable Profit</h3>
-                    <div class="amount ${taxableProfit >= 0 ? 'positive' : 'negative'}">€${taxableProfit.toFixed(2)}</div>
+                    <div class="amount ${summary.taxableProfit >= 0 ? 'positive' : 'negative'}">€${summary.taxableProfit.toFixed(2)}</div>
                 </div>
                 <div class="summary-item">
                     <h3>IRPF Tax Due</h3>
-                    <div class="amount negative">€${irpfTax.toFixed(2)}</div>
+                    <div class="amount negative">€${summary.irpfTax.toFixed(2)}</div>
                 </div>
                 <div class="summary-item">
                     <h3>After Tax Profit</h3>
-                    <div class="amount ${afterTaxProfit >= 0 ? 'positive' : 'negative'}">€${afterTaxProfit.toFixed(2)}</div>
+                    <div class="amount ${summary.afterTaxProfit >= 0 ? 'positive' : 'negative'}">€${summary.afterTaxProfit.toFixed(2)}</div>
                 </div>
             </div>
             
@@ -1240,126 +1251,6 @@ function generateReport() {
             </div>
         </div>
     `;
-}
-
-function printReport() {
-    const reportContent = document.getElementById('reportContent');
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`
-        <html>
-            <head>
-                <title>Financial Report</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; }
-                    .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
-                    .summary-item { border: 1px solid #ddd; padding: 15px; text-align: center; }
-                    .amount { font-size: 1.5em; font-weight: bold; }
-                    .positive { color: green; }
-                    .negative { color: red; }
-                    .warning { color: orange; }
-                </style>
-            </head>
-            <body>
-                ${reportContent.innerHTML}
-            </body>
-        </html>
-    `);
-    printWindow.document.close();
-    printWindow.print();
-}
-
-function exportReport() {
-    const reportType = document.getElementById('reportType').value;
-    const period = document.getElementById('reportPeriod').value;
-    
-    let csvContent = "Date,Type,Platform/Category,Description,Gross Amount,Commission,Net Amount,Status\n";
-    
-    let filteredTransactions = [];
-    let filteredInvoices = [];
-    
-    if (reportType === 'monthly') {
-        const [year, month] = period.split('-');
-        filteredTransactions = transactions.filter(t => {
-            const transactionDate = new Date(t.date);
-            return transactionDate.getFullYear() == year && (transactionDate.getMonth() + 1) == parseInt(month);
-        });
-        filteredInvoices = invoices.filter(inv => {
-            const invoiceDate = new Date(inv.date);
-            return invoiceDate.getFullYear() == year && (invoiceDate.getMonth() + 1) == parseInt(month);
-        });
-    } else if (reportType === 'quarterly') {
-        const [year, quarter] = period.split('-');
-        const qNum = parseInt(quarter.substring(1));
-        const startMonth = (qNum - 1) * 3 + 1;
-        const endMonth = qNum * 3;
-        
-        filteredTransactions = transactions.filter(t => {
-            const transactionDate = new Date(t.date);
-            const month = transactionDate.getMonth() + 1;
-            return transactionDate.getFullYear() == year && month >= startMonth && month <= endMonth;
-        });
-        filteredInvoices = invoices.filter(inv => {
-            const invoiceDate = new Date(inv.date);
-            const month = invoiceDate.getMonth() + 1;
-            return invoiceDate.getFullYear() == year && month >= startMonth && month <= endMonth;
-        });
-    } else if (reportType === 'annual') {
-        const year = parseInt(period);
-        filteredTransactions = transactions.filter(t => {
-            const transactionDate = new Date(t.date);
-            return transactionDate.getFullYear() == year;
-        });
-        filteredInvoices = invoices.filter(inv => {
-            const invoiceDate = new Date(inv.date);
-            return invoiceDate.getFullYear() == year;
-        });
-    }
-    
-    // Add transactions to CSV
-    filteredTransactions.forEach(t => {
-        if (t.type === 'income') {
-            csvContent += `${t.date},Income,${t.platform},"${t.student || 'Teaching'}",${t.grossAmount.toFixed(2)},${t.commission.toFixed(2)},${t.netAmount.toFixed(2)},Received\n`;
-        } else {
-            csvContent += `${t.date},Expense,${t.category},"${t.description}",0,0,-${t.amount.toFixed(2)},Paid\n`;
-        }
-    });
-    
-    // Add invoices to CSV
-    filteredInvoices.forEach(inv => {
-        const status = getInvoiceStatus(inv);
-        csvContent += `${inv.date},Invoice,${inv.student.name},"${inv.number}",${inv.total.toFixed(2)},0,${inv.total.toFixed(2)},${status.charAt(0).toUpperCase() + status.slice(1)}\n`;
-    });
-    
-    // Add social security if applicable
-    const socialSecurityMonthly = parseFloat(document.getElementById('socialSecurity').value) || 0;
-    if (socialSecurityMonthly > 0) {
-        let socialSecurityPeriod = 0;
-        if (reportType === 'monthly') {
-            socialSecurityPeriod = socialSecurityMonthly;
-        } else if (reportType === 'quarterly') {
-            socialSecurityPeriod = socialSecurityMonthly * 3;
-        } else if (reportType === 'annual') {
-            socialSecurityPeriod = socialSecurityMonthly * 12;
-        }
-        csvContent += `${period},Expense,Social Security,"Monthly social security contribution",0,0,-${socialSecurityPeriod.toFixed(2)},Paid\n`;
-    }
-    
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `financial_report_${period}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
-// Set default dates to today
-function setDefaultDates() {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('incomeDate').value = today;
-    document.getElementById('expenseDate').value = today;
 }
 
 // Backup data function
