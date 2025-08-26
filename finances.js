@@ -963,6 +963,10 @@ function updateInvoiceHistory() {
                         `<button class="btn-paid" onclick="markInvoiceAsPaid(${invoice.id})">Mark Paid</button>` : 
                         `<button class="btn-unpaid" onclick="markInvoiceAsUnpaid(${invoice.id})">Mark Unpaid</button>`
                     }
+                    ${currentStatus === 'paid' ? 
+                        `<button class="btn btn-success" style="width: auto; margin: 0; padding: 8px 15px; font-size: 12px;" onclick="generateReceipt(${invoice.id})">Generate Receipt</button>` 
+                        : ''
+                    }
                     <button class="btn" style="width: auto; margin: 0; padding: 8px 15px; font-size: 12px;" onclick="showInvoicePreview(${JSON.stringify(invoice).replace(/"/g, '&quot;')})">View</button>
                     <button class="delete-btn" onclick="deleteInvoice(${invoice.id})">×</button>
                 </div>
@@ -1410,4 +1414,36 @@ function restoreData(event) {
         }
     };
     reader.readAsText(file);
+}
+
+// Receipt functions
+function generateReceipt(invoiceId) {
+    const invoice = invoices.find(inv => inv.id === invoiceId);
+    if (!invoice) return alert("Invoice not found!");
+
+    let html = `
+        <h2>Receipt</h2>
+        <p><strong>Invoice Number:</strong> ${invoice.number}</p>
+        <p><strong>Date Paid:</strong> ${invoice.paidDate ? new Date(invoice.paidDate).toLocaleDateString() : ''}</p>
+        <p><strong>Student:</strong> ${invoice.student.name}</p>
+        <p><strong>Amount Paid:</strong> €${invoice.total.toFixed(2)}</p>
+        <hr>
+        <p>Thank you for your payment!</p>
+    `;
+    document.getElementById('receiptContent').innerHTML = html;
+    document.getElementById('receiptModal').style.display = 'block';
+}
+
+function closeReceiptModal() {
+    document.getElementById('receiptModal').style.display = 'none';
+}
+
+function printReceipt() {
+    const printContents = document.getElementById('receiptContent').innerHTML;
+    const win = window.open('', '', 'height=600,width=800');
+    win.document.write('<html><head><title>Receipt</title></head><body>');
+    win.document.write(printContents);
+    win.document.write('</body></html>');
+    win.document.close();
+    win.print();
 }
