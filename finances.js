@@ -1442,3 +1442,29 @@ function setInvoiceBusinessDefaults() {
 setInvoiceBusinessDefaults();
 
 console.log('Business Expenses this month:', businessExpenses);
+
+// Restore data from backup
+document.getElementById('backupFile').addEventListener('change', restoreData);
+
+function restoreData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (data.transactions && data.students && data.invoices) {
+                localStorage.setItem('teachingFinances', JSON.stringify(data.transactions));
+                localStorage.setItem('teachingStudents', JSON.stringify(data.students));
+                localStorage.setItem('teachingInvoices', JSON.stringify(data.invoices));
+                alert('Backup restored! The page will now reload.');
+                location.reload();
+            } else {
+                alert('Invalid backup file format.');
+            }
+        } catch (err) {
+            alert('Invalid backup file.');
+        }
+    };
+    reader.readAsText(file);
+}

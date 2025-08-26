@@ -490,6 +490,8 @@
             <h1>📚 Teaching Finance Tracker</h1>
             <p>Track your freelance English teaching income, platform commissions, Spanish IRPF tax, student management, and invoice payments</p>
             <button class="btn" onclick="backupData()" style="margin-top:15px;">🔄 Backup Data</button>
+            <button class="btn" onclick="document.getElementById('restoreInput').click()" style="margin-top:15px;">♻️ Restore Data</button>
+            <input type="file" id="restoreInput" accept=".json" style="display:none" onchange="restoreData(event)">
         </div>
         
         <div class="tabs">
