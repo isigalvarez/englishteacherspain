@@ -1253,6 +1253,59 @@ function generateReport() {
     `;
 }
 
+// Print the current report
+function printReport() {
+    const reportContent = document.getElementById('reportContent');
+    if (!reportContent) return;
+    const printWindow = window.open('', '', 'width=900,height=1000');
+    printWindow.document.write(`
+        <html>
+            <head>
+                <title>Financial Report</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 30px; }
+                </style>
+            </head>
+            <body>
+                ${reportContent.innerHTML}
+                <script>window.onload = function() { window.print(); }</script>
+            </body>
+        </html>
+    `);
+    printWindow.document.close();
+}
+
+// Export the current report as CSV
+function exportReport() {
+    const reportContent = document.getElementById('reportContent');
+    if (!reportContent) return;
+
+    // Extract summary table data
+    const rows = [];
+    const summaryItems = reportContent.querySelectorAll('.summary-item');
+    summaryItems.forEach(item => {
+        const label = item.querySelector('h3')?.innerText || '';
+        const value = item.querySelector('.amount')?.innerText || '';
+        if (label && value) rows.push([label, value]);
+    });
+
+    // Add a header
+    let csv = 'Category,Amount\n';
+    rows.forEach(row => {
+        csv += `"${row[0]}","${row[1]}"\n`;
+    });
+
+    // Download as CSV
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `Financial_Report_${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+}
+
 // Backup data function
 function backupData() {
     const data = {
