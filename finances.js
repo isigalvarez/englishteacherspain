@@ -51,6 +51,7 @@ function showTab(tabName) {
         updateInvoiceHistory();
         updateInvoiceFilters();
         setInvoiceDefaults();
+        setInvoiceBusinessDefaults(); // <-- Add this line here
     }
 }
 
@@ -1382,8 +1383,6 @@ function setInvoiceBusinessDefaults() {
         document.getElementById('businessPhone').value = window.BUSINESS_DEFAULTS.phone || "";
     }
 }
-// Call this after DOM is ready or when showing the invoice form
-setInvoiceBusinessDefaults();
 
 console.log('Business Expenses this month:', businessExpenses);
 
