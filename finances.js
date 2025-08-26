@@ -623,14 +623,20 @@ function setInvoiceDefaults() {
     const today = new Date();
     const dueDate = new Date(today);
     dueDate.setDate(today.getDate() + 30); // 30 days from today
-    
+
     document.getElementById('invoiceDate').value = today.toISOString().split('T')[0];
     document.getElementById('dueDate').value = dueDate.toISOString().split('T')[0];
-    
+
     // Generate invoice number
     const invoiceCount = invoices.length + 1;
     const year = today.getFullYear();
     document.getElementById('invoiceNumber').value = `INV-${year}-${String(invoiceCount).padStart(3, '0')}`;
+
+    // Set default notes if not already set
+    const notesField = document.getElementById('invoiceNotes');
+    if (window.BUSINESS_DEFAULTS && window.BUSINESS_DEFAULTS.defaultInvoiceNotes && !notesField.value) {
+        notesField.value = window.BUSINESS_DEFAULTS.defaultInvoiceNotes;
+    }
 }
 
 // Invoice form submission

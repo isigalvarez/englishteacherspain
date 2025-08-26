@@ -4,4 +4,5 @@ window.BUSINESS_DEFAULTS = {
     address: "Calle Mayor 1, 28013 Madrid",
     email: "jane@email.com",
     phone: "+34 600 000 000"
+    defaultInvoiceNotes: "Esta formación está exenta de IVA en virtud del Art. 20, punto 9 de la Ley IVA 37/1992 - IVA"
 };
