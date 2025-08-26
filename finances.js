@@ -1453,3 +1453,12 @@ function printReceipt() {
     win.document.close();
     win.print();
 }
+
+// Set default dates for income and expense forms
+function setDefaultDates() {
+    const today = new Date().toISOString().split('T')[0];
+    const incomeDate = document.getElementById('incomeDate');
+    const expenseDate = document.getElementById('expenseDate');
+    if (incomeDate) incomeDate.value = today;
+    if (expenseDate) expenseDate.value = today;
+}
