@@ -808,22 +808,22 @@ function showInvoicePreview(invoice) {
 }
 
 function generateInvoiceHTML(invoice) {
-    const invoiceDate = new Date(invoice.date).toLocaleDateString('en-GB');
-    const dueDate = new Date(invoice.dueDate).toLocaleDateString('en-GB');
+    const invoiceDate = new Date(invoice.date).toLocaleDateString('es-ES');
+    const dueDate = new Date(invoice.dueDate).toLocaleDateString('es-ES');
 
     return `
         <div class="invoice-header">
-            <div class="invoice-title">INVOICE</div>
+            <div class="invoice-title">FACTURA</div>
             <div class="invoice-info">
-                <strong>Invoice #:</strong> ${invoice.number}<br>
-                <strong>Date:</strong> ${invoiceDate}<br>
-                <strong>Due Date:</strong> ${dueDate}
+                <strong>Nº de Factura:</strong> ${invoice.number}<br>
+                <strong>Fecha:</strong> ${invoiceDate}<br>
+                <strong>Fecha de vencimiento:</strong> ${dueDate}
             </div>
         </div>
         
         <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
             <div class="business-info">
-                <h3>From:</h3>
+                <h3>De:</h3>
                 <strong>${invoice.business.name}</strong><br>
                 ${invoice.business.nif ? `NIF: ${invoice.business.nif}<br>` : ''}
                 ${invoice.business.address.replace(/\n/g, '<br>')}<br>
@@ -832,7 +832,7 @@ function generateInvoiceHTML(invoice) {
             </div>
             
             <div class="client-info">
-                <h3>To:</h3>
+                <h3>Para:</h3>
                 <strong>${invoice.student.name}</strong><br>
                 ${invoice.student.address ? `${invoice.student.address.replace(/\n/g, '<br>')}<br>` : ''}
                 ${invoice.student.email ? `${invoice.student.email}<br>` : ''}
@@ -843,9 +843,9 @@ function generateInvoiceHTML(invoice) {
         <table>
             <thead>
                 <tr>
-                    <th>Description</th>
-                    <th class="text-right">Hours</th>
-                    <th class="text-right">Rate (€/hr)</th>
+                    <th>Descripción</th>
+                    <th class="text-right">Horas</th>
+                    <th class="text-right">Tarifa (€/h)</th>
                     <th class="text-right">IVA %</th>
                     <th class="text-right">IRPF %</th>
                     <th class="text-right">Subtotal</th>
@@ -891,7 +891,7 @@ function generateInvoiceHTML(invoice) {
         
         ${invoice.notes ? `
             <div class="invoice-notes">
-                <h4>Notes:</h4>
+                <h4>Notas:</h4>
                 <p>${invoice.notes.replace(/\n/g, '<br>')}</p>
             </div>
         ` : ''}
@@ -1425,16 +1425,16 @@ function restoreData(event) {
 // Receipt functions
 function generateReceipt(invoiceId) {
     const invoice = invoices.find(inv => inv.id === invoiceId);
-    if (!invoice) return alert("Invoice not found!");
+    if (!invoice) return alert("¡Factura no encontrada!");
 
     let html = `
-        <h2>Receipt</h2>
-        <p><strong>Invoice Number:</strong> ${invoice.number}</p>
-        <p><strong>Date Paid:</strong> ${invoice.paidDate ? new Date(invoice.paidDate).toLocaleDateString() : ''}</p>
-        <p><strong>Student:</strong> ${invoice.student.name}</p>
-        <p><strong>Amount Paid:</strong> €${invoice.total.toFixed(2)}</p>
+        <h2>Recibo</h2>
+        <p><strong>Nº de Factura:</strong> ${invoice.number}</p>
+        <p><strong>Fecha de pago:</strong> ${invoice.paidDate ? new Date(invoice.paidDate).toLocaleDateString('es-ES') : ''}</p>
+        <p><strong>Alumno/a:</strong> ${invoice.student.name}</p>
+        <p><strong>Cantidad pagada:</strong> €${invoice.total.toFixed(2)}</p>
         <hr>
-        <p>Thank you for your payment!</p>
+        <p>¡Gracias por su pago!</p>
     `;
     document.getElementById('receiptContent').innerHTML = html;
     document.getElementById('receiptModal').style.display = 'block';
