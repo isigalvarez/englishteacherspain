@@ -690,7 +690,8 @@ document.getElementById('invoiceForm').addEventListener('submit', function(e) {
             name: student.name,
             email: student.email,
             phone: student.phone,
-            address: student.address
+            address: student.address,
+            nif: student.nif // <-- Add this line
         },
         business: {
             name: document.getElementById('businessName').value,
@@ -834,8 +835,8 @@ function generateInvoiceHTML(invoice) {
             <div class="client-info">
                 <h3>Para:</h3>
                 <strong>${invoice.student.name}</strong><br>
+                ${invoice.student.nif ? `NIF: ${invoice.student.nif}<br>` : ''}
                 ${invoice.student.address ? `${invoice.student.address.replace(/\n/g, '<br>')}<br>` : ''}
-                ${invoice.student.email ? `${invoice.student.email}<br>` : ''}
                 ${invoice.student.phone ? `${invoice.student.phone}` : ''}
             </div>
         </div>
