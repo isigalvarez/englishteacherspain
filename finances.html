@@ -797,13 +797,6 @@
             <div class="main-content">
                 <div class="section" style="grid-column: 1 / -1;">
                     <h2>🧾 Create Invoice</h2>
-                    <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="ivaToggle">
-                            <span class="toggle-slider"></span>
-                        </label>
-                        <span>Include IVA (21%)</span>
-                    </div>
                     <form id="invoiceForm">
                         <div class="form-row">
                             <div class="form-group">
@@ -876,12 +869,18 @@
                                         <input type="number" class="service-rate" step="0.01" placeholder="25.00" onchange="calculateInvoiceTotal()" required>
                                     </div>
                                     <div class="form-group">
-                                        <label>IVA (%)</label>
-                                        <input type="number" class="service-iva" step="0.1" placeholder="0" onchange="calculateInvoiceTotal()">
+                                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                            <label class="toggle-switch" style="margin: 0;">
+                                                <input type="checkbox" class="service-iva-toggle" onchange="toggleServiceIVA(this)">
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                            <span>IVA</span>
+                                        </div>
+                                        <input type="number" class="service-iva" step="0.1" value="0" onchange="calculateInvoiceTotal()" style="display: none;">
                                     </div>
                                     <div class="form-group">
                                         <label>IRPF (%)</label>
-                                        <input type="number" class="service-irpf" step="0.1" placeholder="0" onchange="calculateInvoiceTotal()">
+                                        <input type="number" class="service-irpf" step="0.1" placeholder="15" onchange="calculateInvoiceTotal()">
                                     </div>
                                     <button type="button" class="btn btn-expense" style="width: auto; padding: 8px 12px;" onclick="removeService(this)">Remove</button>
                                 </div>

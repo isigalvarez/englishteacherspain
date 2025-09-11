@@ -522,6 +522,7 @@ function populateStudentInfo() {
     const firstServiceRow = document.querySelector('.service-row');
     const descriptionInput = firstServiceRow.querySelector('.service-description');
     const rateInput = firstServiceRow.querySelector('.service-rate');
+    const ivaToggle = firstServiceRow.querySelector('.service-iva-toggle');
     const ivaInput = firstServiceRow.querySelector('.service-iva');
     
     descriptionInput.value = `English lessons - ${student.classType}`;
@@ -529,9 +530,13 @@ function populateStudentInfo() {
     
     // Set IVA if conversation class
     if (student.classType.includes('+21% IVA')) {
-        ivaInput.value = 21;
+        ivaToggle.checked = true;
+        ivaInput.style.display = 'block';
+        ivaInput.value = '21';
     } else {
-        ivaInput.value = 0;
+        ivaToggle.checked = false;
+        ivaInput.style.display = 'none';
+        ivaInput.value = '0';
     }
     
     calculateInvoiceTotal();
@@ -539,17 +544,9 @@ function populateStudentInfo() {
 
 function addService() {
     const container = document.getElementById('servicesContainer');
-    const showIVA = document.getElementById('ivaToggle').checked;
     const newService = document.createElement('div');
     newService.className = 'service-row';
     
-    let ivaField = showIVA ? `
-        <div class="form-group">
-            <label>IVA (%)</label>
-            <input type="number" class="service-iva" step="0.1" value="21" onchange="calculateInvoiceTotal()">
-        </div>
-    ` : '';
-
     newService.innerHTML = `
         <div class="form-row" style="align-items: end;">
             <div class="form-group">
@@ -564,7 +561,16 @@ function addService() {
                 <label>Rate (€/hour)</label>
                 <input type="number" class="service-rate" step="0.01" placeholder="25.00" onchange="calculateInvoiceTotal()" required>
             </div>
-            ${ivaField}
+            <div class="form-group">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                    <label class="toggle-switch" style="margin: 0;">
+                        <input type="checkbox" class="service-iva-toggle" onchange="toggleServiceIVA(this)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span>IVA</span>
+                </div>
+                <input type="number" class="service-iva" step="0.1" value="0" onchange="calculateInvoiceTotal()" style="display: none;">
+            </div>
             <div class="form-group">
                 <label>IRPF (%)</label>
                 <input type="number" class="service-irpf" step="0.1" placeholder="15" onchange="calculateInvoiceTotal()">
@@ -572,22 +578,27 @@ function addService() {
             <button type="button" class="btn btn-expense" style="width: auto; padding: 8px 12px;" onclick="removeService(this)">Remove</button>
         </div>
     `;
+    
     container.appendChild(newService);
+    calculateInvoiceTotal();
 }
 
-// Add event listener for IVA toggle
-document.addEventListener('DOMContentLoaded', function() {
-    const ivaToggle = document.getElementById('ivaToggle');
-    if (ivaToggle) {
-        ivaToggle.addEventListener('change', function() {
-            // Remove all existing service rows
-            const container = document.getElementById('servicesContainer');
-            container.innerHTML = '';
-            // Add a fresh service row with updated IVA visibility
-            addService();
-        });
+function toggleServiceIVA(checkbox) {
+    const serviceRow = checkbox.closest('.service-row');
+    const ivaInput = serviceRow.querySelector('.service-iva');
+    
+    if (checkbox.checked) {
+        ivaInput.style.display = 'block';
+        ivaInput.value = '21';
+        ivaInput.placeholder = '';
+    } else {
+        ivaInput.style.display = 'none';
+        ivaInput.value = '';
+        ivaInput.placeholder = '-';
     }
-});
+    
+    calculateInvoiceTotal();
+}
 
 function removeService(button) {
     const serviceRows = document.querySelectorAll('.service-row');
@@ -604,9 +615,17 @@ function calculateInvoiceTotal() {
     let totalIRPF = 0;
 
     serviceRows.forEach(row => {
+        const ivaToggle = row.querySelector('.service-iva-toggle').checked;
+        const ivaDisplay = row.querySelector('.service-iva');
+        
+        if (!ivaToggle) {
+            ivaDisplay.value = '';
+            ivaDisplay.placeholder = '-';
+        }
+
         const hours = parseFloat(row.querySelector('.service-hours').value) || 0;
         const rate = parseFloat(row.querySelector('.service-rate').value) || 0;
-        const ivaPercent = parseFloat(row.querySelector('.service-iva').value) || 0;
+        const ivaPercent = ivaToggle ? (parseFloat(ivaDisplay.value) || 21) : 0;
         const irpfPercent = parseFloat(row.querySelector('.service-irpf')?.value) || 0;
 
         const lineTotal = hours * rate;
@@ -622,20 +641,7 @@ function calculateInvoiceTotal() {
 
     document.getElementById('invoiceSubtotal').textContent = subtotal.toFixed(2);
     document.getElementById('invoiceIVA').textContent = totalIVA.toFixed(2);
-    // Add this line for IRPF display:
-    let irpfElem = document.getElementById('invoiceIRPF');
-    if (!irpfElem) {
-        // Create IRPF display if not present
-        const totalBox = document.getElementById('invoiceTotal').parentElement.parentElement;
-        const irpfRow = document.createElement('div');
-        irpfRow.style.fontSize = "1.1em";
-        irpfRow.style.marginBottom = "5px";
-        irpfRow.innerHTML = `IRPF: -€<span id="invoiceIRPF">0.00</span>`;
-        totalBox.insertBefore(irpfRow, totalBox.children[1]);
-        irpfElem = document.getElementById('invoiceIRPF');
-    }
-    irpfElem.textContent = totalIRPF.toFixed(2);
-
+    document.getElementById('invoiceIRPF').textContent = totalIRPF.toFixed(2);
     document.getElementById('invoiceTotal').textContent = total.toFixed(2);
 }
 
@@ -666,9 +672,6 @@ document.getElementById('invoiceForm').addEventListener('submit', function(e) {
     const studentId = document.getElementById('invoiceStudent').value;
     const student = students.find(s => s.id == studentId);
     
-    // Add this line to get IVA toggle state
-    const includeIVA = document.getElementById('ivaToggle').checked;
-    
     // Collect services
     const serviceRows = document.querySelectorAll('.service-row');
     const services = [];
@@ -680,7 +683,8 @@ document.getElementById('invoiceForm').addEventListener('submit', function(e) {
         const description = row.querySelector('.service-description').value;
         const hours = parseFloat(row.querySelector('.service-hours').value) || 0;
         const rate = parseFloat(row.querySelector('.service-rate').value) || 0;
-        const ivaPercent = includeIVA ? (parseFloat(row.querySelector('.service-iva')?.value) || 0) : 0;
+        const ivaToggle = row.querySelector('.service-iva-toggle').checked;
+        const ivaPercent = ivaToggle ? (parseFloat(row.querySelector('.service-iva').value) || 0) : 0;
         const irpfPercent = parseFloat(row.querySelector('.service-irpf').value) || 0;
         
         const lineTotal = hours * rate;
@@ -695,7 +699,8 @@ document.getElementById('invoiceForm').addEventListener('submit', function(e) {
             irpfPercent,
             lineTotal,
             lineIVA,
-            lineIRPF
+            lineIRPF,
+            hasIVA: ivaToggle
         });
         
         subtotal += lineTotal;
@@ -708,7 +713,6 @@ document.getElementById('invoiceForm').addEventListener('submit', function(e) {
         number: document.getElementById('invoiceNumber').value,
         date: document.getElementById('invoiceDate').value,
         dueDate: document.getElementById('dueDate').value,
-        includeIVA: includeIVA, // Add this line to store IVA toggle state
         student: {
             id: studentId,
             name: student.name,
@@ -740,7 +744,7 @@ document.getElementById('invoiceForm').addEventListener('submit', function(e) {
     updateDisplay();
     
     // Show the generated invoice
-    downloadInvoiceHTML(invoice);
+    showInvoicePreview(invoice);
 });
 
 function showInvoicePreview(invoice) {
@@ -832,11 +836,12 @@ function showInvoicePreview(invoice) {
     previewWindow.document.close();
 }
 
+// Update generateInvoiceHTML function
 function generateInvoiceHTML(invoice) {
     const invoiceDate = new Date(invoice.date).toLocaleDateString('es-ES');
     const dueDate = new Date(invoice.dueDate).toLocaleDateString('es-ES');
-    // Use the invoice's stored IVA state instead of checking services
-    const hasIVA = invoice.includeIVA;
+    // Check if any service has IVA
+    const hasIVA = invoice.services.some(service => service.hasIVA);
 
     return `
         <div class="invoice-header">
@@ -873,10 +878,10 @@ function generateInvoiceHTML(invoice) {
                     <th>Descripción</th>
                     <th class="text-right">Horas</th>
                     <th class="text-right">Tarifa (€/h)</th>
-                    ${hasIVA ? '<th class="text-right">IVA %</th>' : ''}
+                    <th class="text-right">IVA %</th>
                     <th class="text-right">IRPF %</th>
                     <th class="text-right">Subtotal</th>
-                    ${hasIVA ? '<th class="text-right">IVA</th>' : ''}
+                    <th class="text-right">IVA</th>
                     <th class="text-right">IRPF</th>
                     <th class="text-right">Total</th>
                 </tr>
@@ -887,32 +892,30 @@ function generateInvoiceHTML(invoice) {
                         <td>${service.description}</td>
                         <td class="text-right">${service.hours}</td>
                         <td class="text-right">€${service.rate.toFixed(2)}</td>
-                        ${hasIVA ? `<td class="text-right">${service.ivaPercent || 0}%</td>` : ''}
-                        <td class="text-right">${service.irpfPercent || 0}%</td>
+                        <td class="text-right">${service.hasIVA ? `${service.ivaPercent}%` : '-'}</td>
+                        <td class="text-right">${service.irpfPercent > 0 ? `${service.irpfPercent}%` : '-'}</td>
                         <td class="text-right">€${service.lineTotal.toFixed(2)}</td>
-                        ${hasIVA ? `<td class="text-right">€${service.lineIVA?.toFixed(2) || '0.00'}</td>` : ''}
-                        <td class="text-right">-€${service.lineIRPF?.toFixed(2) || '0.00'}</td>
+                        <td class="text-right">${service.hasIVA ? `€${service.lineIVA.toFixed(2)}` : '-'}</td>
+                        <td class="text-right">${service.lineIRPF > 0 ? `- €${service.lineIRPF.toFixed(2)}` : '-'}</td>
                         <td class="text-right">€${(service.lineTotal + (service.lineIVA || 0) - (service.lineIRPF || 0)).toFixed(2)}</td>
                     </tr>
                 `).join('')}
             </tbody>
             <tfoot>
                 <tr class="total-row">
-                    <td colspan="${hasIVA ? '8' : '7'}"><strong>Subtotal:</strong></td>
+                    <td colspan="8"><strong>Subtotal:</strong></td>
                     <td class="text-right"><strong>€${invoice.subtotal.toFixed(2)}</strong></td>
                 </tr>
-                ${hasIVA ? `
-                    <tr class="total-row">
-                        <td colspan="8"><strong>Total IVA:</strong></td>
-                        <td class="text-right"><strong>€${invoice.totalIVA.toFixed(2)}</strong></td>
-                    </tr>
-                ` : ''}
                 <tr class="total-row">
-                    <td colspan="${hasIVA ? '8' : '7'}"><strong>Total IRPF:</strong></td>
-                    <td class="text-right"><strong>-€${invoice.totalIRPF?.toFixed(2) || '0.00'}</strong></td>
+                    <td colspan="8"><strong>IVA Total:</strong></td>
+                    <td class="text-right"><strong>€${invoice.totalIVA.toFixed(2)}</strong></td>
+                </tr>
+                <tr class="total-row">
+                    <td colspan="8"><strong>IRPF Total:</strong></td>
+                    <td class="text-right"><strong>- €${invoice.totalIRPF.toFixed(2)}</strong></td>
                 </tr>
                 <tr class="total-row" style="font-size: 1.2em;">
-                    <td colspan="${hasIVA ? '8' : '7'}"><strong>TOTAL:</strong></td>
+                    <td colspan="8"><strong>TOTAL:</strong></td>
                     <td class="text-right"><strong>€${invoice.total.toFixed(2)}</strong></td>
                 </tr>
             </tfoot>
@@ -1490,4 +1493,19 @@ function setDefaultDates() {
     const expenseDate = document.getElementById('expenseDate');
     if (incomeDate) incomeDate.value = today;
     if (expenseDate) expenseDate.value = today;
+}
+
+function toggleIVA(checkbox) {
+    const serviceRow = checkbox.closest('.service-row');
+    const ivaInput = serviceRow.querySelector('.service-iva');
+    
+    if (checkbox.checked) {
+        ivaInput.style.display = 'block';
+        ivaInput.value = '21';
+    } else {
+        ivaInput.style.display = 'none';
+        ivaInput.value = '0';
+    }
+    
+    calculateInvoiceTotal();
 }
